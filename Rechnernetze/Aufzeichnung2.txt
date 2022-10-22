@@ -1,0 +1,59 @@
+100MBit
+	Cat5 oder besser
+	nutzt nur 2 TPs (4 adern)
+
+1Gbit
+	Cat5e oder besser
+	5 Signalzustände: +1v, +.5v, 0v, -.5v, -1v
+4 Aderpaare -> 5^4 = 625 Symbole pro Schritt übertragbar
+Trelliskodierung:
+	Aufteilung des Bytes in 4 Gruppen zu je 2 Bit
+	Erweiterung jeder Gruppe von 2Bit auf 3Bit mittels trellis-code (TCM)
+	zusätzliches Bit liefert Fehlerkorrekturinformation zur Vorwärtsfehlerkorrektur
+
+Übertragungsmedien:
+	Twisted Pair (TP)
+	Lichtwellen Leiter (LWL)
+
+RJ45:
+	TP-verteilung:
+		tp1: pins 1, 2
+		tp2: pins 3, 6
+		tp3: pins 4, 5
+		tp4: pins 6, 7
+	
+	crossover-kabel:
+		jeweils 1, 2 mit 3, 6 des anderen Steckers verbinden
+	
+	Kabelschirmungen:
+		"Shielded": Schild um einzelne Pairs
+		"Screened": Schild um Gesamtkabel
+
+		Unshielded Twisted Pair: UTP
+		Screened Unshielded Twisted pair: S-UTP
+		Shielded Twisted Pair: STP
+		Screened Shielded Twisted Pair: S-STP
+
+	Bezeichnungsschema: ISO/IEC-11801 (2002)E   XX/YZZ
+
+	XX (Gesamtschirmung):
+		...
+		
+Klassifizierung nach europäischer Norm:
+	7 Klassen A bis F:
+		C: Cat3
+		D: Cat5
+		E: Cat6 + Cat5e
+		F: Cat7
+
+
+Löt- Schraub und Abisolierfrei = LSA+
+
+Lichtwellenleiter:
+	Bandbreiten > 40GBit
+	Distanzen > 100m
+	2 Fasern pro Verbindung (1 senden, 1 empfangen)
+	Wellenlängenbereiche:
+		LED         mit  850 - 1300nm bei  Multimode-Fasern
+		Laser-LED:  mit 1300 - 1550nm bei Singlemode-Fasern
+	

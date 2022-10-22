@@ -1,0 +1,58 @@
+1)
+a) ja
+Währungszeichen in Bezeichnern sind erlaubt
+b) ja
+Unterstriche in Bezeichnern sind erlaubt
+c) nein
+minus in Bezeichnern ist nicht erlaubt
+d) nein
+Zahlen in Bezeichnern sind nur nach dem ersten Zeichen erlaubt
+e) ja
+operator ist in java kein keyword
+f) ja
+boolean-konstanten in java werden klein geschrieben, True ist kein Keyword
+
+
+2)
+a) nein
+b) nein
+Division durch 0 ist in IEEE754 definiert (1. / 0. ergibt +inf)
+c) nein
+integer haben keinen wert "infinity"
+d) Ja
+java wandelt +inf in den grössten möglichen Integer um
+
+3)
+a) richtig
+a^a bedeutet a XOR a und ergibt 0
+~a bedeutet NICHT a und ergibt ebenfalls 0, da die -1 im 2's complement der Zustand ist, bei dem alle bits 1 sind
+b) richtig
+Wenn man jedes bit genau 2 mal invertiert, kommt man wieder auf den Startzustand
+c) richtig
+a<0 ist true
+!a<0 ist somit false
+-> daher wird vom ternary operator der erste Fall zurückgegeben
+d) richtig
+>>> ist der logische shift operator. daher werden die signifikantesten bits unabhängig vom Vorzeichen mit 0 aufgefüllt.
+somit sind nach (-1 >>> 1) alle Bits ausser dem Vorzeichen 1, was dem grössten repräsentierbaren Integerwert entspricht
+e) richtig
+b&c = 8&3 = 0
+b|c = 8|3 = 12
+0 % 12 = 0
+f) falsch
+nach auflösen der klammer ist der Ausdruck 12%0, was einer Division durch 0 gleichkommt und eine Exception wirft
+
+
+4)
+a) richtig
+der Integer-Wrapper wird im Ausdruck in einen primitiven integer kollabiert
+b) falsch
+die Objekte werden als referenzen verglichen
+c) wahr
+die Equals-methode ist für Integer speziell überladen
+d) falsch
+j wird zum primitiven Integer kollabiert und mit i verglichen. die Ausgabe ist true.
+e) falsch
+i+"" und j+"" ergeben beide den String "1"
+bei vergleich durch .equals ergibt das true.
+

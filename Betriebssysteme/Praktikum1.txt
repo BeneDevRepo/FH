@@ -1,0 +1,79 @@
+1.2.1:
+man 1: Ausführbare Programme oder Shell-Befehle
+man 2: Systemaufrufe (Kernel-Funktionen)
+man 3: Bibliotheksaufrufe(Funktionen in Programmbibliotheken)
+man 5: Dateiformate und konventionen, z.B. /etc/passwd
+man 8: Befehle für die Systemverwaltung (in der Regel nur für root)
+
+1.2.2:
+eine (/usr/bin/printf)
+
+1.3.1:
+man 1:
+shell-befehl, zur formatierten ausgabe von text in scripts
+man 3:
+system-api funktion, z.B. mittels c/c++ nutzbar
+
+printf "%s\n" "Hallo, Welt!"
+printf "%8d\n" 4711
+printf "%8.2f\n" 47,11
+printf "%8.2f\n" 47.11
+
+1.3.2:
+Im deutschen Sprachmodus müssen Fliesskommazahlen mit "," angegeben werden, im Englischen Modus mit ".". Ansonsten wird ein Fehler ausgegeben.
+Im falle von locate Ändert sich je nach Spracheinstellungen die Sprache der Fehlermeldung
+
+1.4.1:
+-- Erstellen:
+touch test01.dat
+touch test02.dat
+mkdir sub01
+mkdir sub02
+cd sub01
+touch test0101.dat
+touch test0102.dat
+cd ../sub02
+mkdir sub0201
+cd sub0201
+touch test020101.dat
+touch test020103.dat
+
+-- Löschen:
+cd ~
+rm test01.dat
+rm test02.dat
+rm sub01/test0101.dat
+rm sub01/test0102.dat
+rm sub02/sub0201/test020101.dat
+rm sub02/sub0201/test020102.dat
+rm sub02/sub0201/test020103.dat
+rmdir sub01
+rmdir sub02/sub0201
+rmdir sub02
+
+
+
+2.1:
+1: sort phone.book
+
+2: column -t -s! phone.book | grep -o -E "( [[:digit:]]+ )" | sort -r
+
+3: 
+
+4: cat phone.book | tr ! :
+
+5: head -n 1 phone.book
+
+6: cat phone.book | grep -x -E "(Hans|Wolf).*"
+
+
+2.2:
+1:
+
+2: column -t -s, | sort
+
+3:
+
+2.3: cut -d : -f1 /etc/passwd | sort
+
+2.4: ls -S /usr | less # todo
