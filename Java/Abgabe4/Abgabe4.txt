@@ -1,0 +1,22 @@
+==========  Aufgabe 1.1  ==========:
+Dass dern Kostruktor von Fill privat ist bewirkt, dass Fill nicht von Aussen instanziert werden kann.
+Dass die Klasse Fill final ist bedeutet, dass auch keine Klassen von Fill abgeleitet werden können,
+um selbst öffentliche Konstruktoren zu definieren.
+
+==========  Aufgabe 4  ==========:
+Beispielausgabe: (Hauptmessungen wurden auf einem anderen PC durchgeführt)
+|Methode             |Laenge /char |Dauer /ms |
+|Stringverkettung    |       100000|      1029|
+|char-array          |    100000000|       152|
+|StringBuilder       |    100000000|       354|
+
+Die Laufzeit der StringVerkettung-basierten Funktion steigt quadratisch ( O(n^2) ),
+da mit jedem Schleifendurchlauf eine kopie des aktuellen Strings angefertigt wird (Strings sind immutable),
+und der String jeden Durchlauf ein Zeichen länger wird.
+
+Die Laufzeiten der char[] und StringBuilder Funktionen steigen augenscheinlich linear ( O(n) ), wobei die char[] - basierte
+Funktion im Durchschnitt ca. 20% schneller ist als die StringBuilder basierte Funktion.
+
+Der StringBuilder-Ansatz ist also offensichtlich schneller als der String-Verkettungs-Ansatz (schon allein aus Perspektive
+der Zeitkomplexitaet), Fügt aber dennoch im vergleich zum char[]-Ansatz eine gewisse Menge an zusaetzlichem overhead
+hinzu (vermutlich vorallem aufgrund der Funktionsaufrufe)
