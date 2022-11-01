@@ -1,0 +1,86 @@
+Aufgabe 1)
+b)
+Konsolenpasswort:
+configure terminal
+line 0 15
+password cisco encrypted
+end / exit
+
+Privileged Password:
+configure terminal
+enable password class
+exit
+
+MOTD:
+banner-motd banner "Neues Banner" motd "Neue MOTD"
+commit
+
+
+
+
+Aufgabe 2)
+a)
+Hub:
+Bitweiser broadcast an alle ports
+ISO/OSI: 1 (Physical)
+
+Switch:
+Versteht und speichert mac-addressen
+ISO/OSI: 2/3 (Datalink/Network)
+
+Router:
+Versteht IP und kann zwischen mehreren Netzwerken übersetzen
+ISO/OSI: 3 (Network)
+
+b)
+Versuchsaufbau: Stern
+andere:
+Ring (alle Verbindungen bilden einen Kreis, somit einfache Redundanz)
+Mesh (Alle geräte sind mit allen anderen Geräten verbunden, bei N geräten:
+N-2 - fache Redundanz)
+
+c)
+CSMA/CD:
+Carrier Sense Multiple Access/Collision Detection
+verhindert bzw. erkennt und korrigiert kollisionen auf Leitungen, auf denen mehrere Geräte senden dürfen
+
+
+
+
+f)
+ARP (Address Resolution Protocol)
+ICMP (Internet Control Message Protocol)
+
+
+h)
+Nun sehen auch PC2 und PC3 den Ping
+
+
+i)
+PC2, PC3, PC4, S2, R1
+
+
+j)
+ARP (Address Resolution Protocol)
+
+
+3)
+Vermittlungsschicht = OSI 3
+IP-Addressierung:
+OSI 3 (Network Layer)
+=TCP/IP 2 (Internet)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
