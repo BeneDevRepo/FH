@@ -1,0 +1,14 @@
+
+2.1)
+([^\n]+)$\r\n(\1\r\n)   ->   \1\r\n
+
+2.2)
+([^\n]+)$\r\n   ->   \1,\r\n
+
+INSERT INTO Namen (name) VALUES (
+	...
+);
+
+
+3)
+CREATE PROCEDURE proc_NewKey

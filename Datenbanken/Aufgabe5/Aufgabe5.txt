@@ -1,0 +1,33 @@
+
+3)
+group = db.Groups.findOne({Groupname: "Gruppe1"});
+members = db.Collection1.find({group: group._id}).limit(5000).toArray()
+
+
+5)
+a)
+Datenbanken in MongoDB bestehen aus Collections (ähnlich Tabellen).
+In diesen Collections werden Daten mittels BSON Dokumenten gespeichert.
+
+b)
+JSON ist ein text-basiertes hierarchisches dateiformat.
+BSON ist ein JSON-ähnlich strukturiertes binäres Dateiformat
+und somit platzsparender und schneller als JSON.
+
+c)
+Eine capped Collection ist eine Collection fester Größe, deren Reihenfolge
+der Einfüge-Reihenfolge entspricht. Dadurch fällt Verwaltungsarbeit weg wodurch
+inserts weniger Rechenleistung nutzen. Ist eine capped Collection voll, werden
+die ältesten Daten mit den neu einzufügenden Daten überschrieben.
+
+d)
+In der Query-Phase werden die Datensätze aus bestimmten Collections herausgefiltert,
+auf die die Bedingung (Status='A') zutrifft. 
+
+In der Map-Phase werden daraufhin Einträge mit gleichem Schlüssel in einen Eintrag 
+zusammengefasst (z.B Einträge mit cust_id 'A123').
+Die Zeile Status wird dabei nicht kopiert.
+
+In der Reduce-Phase werden letztendlich die Einträge zusammengefasst, von denen es in der 
+Map-Phase mehr als einen Eintrag gegeben hat (Also z.B. das Feld "amount" bei cust_id='A123').
+Diese zusammengesetzten Datensätze werden dann in der output-Collection gespeichert.

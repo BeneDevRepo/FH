@@ -1,7 +1,0 @@
-Normalformen
-1NF: Atomaritaet
-2NF: 1NF + Alle Nichtschluessel-Attribute haengen vom Primaerschluessel ab??
-3NF: 2NF + 
-BCNF: 3NF + 
-4NF: BCNF + 
-5NF: 4NF + 
