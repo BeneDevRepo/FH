@@ -1,14 +1,14 @@
-,,,
-Gnats Bug-Reporting System (admin)
-Mailing List Manager
-TPM software stack,,,
 backup
+Bene
 bin
 daemon
+fwupd-refresh user,,,
 games
+Gnats Bug-Reporting System (admin)
 ircd
 lp
 mail
+Mailing List Manager
 man
 news
 nobody
@@ -19,5 +19,6 @@ sys
 systemd Network Management,,,
 systemd Resolver,,,
 systemd Time Synchronization,,,
+TPM software stack,,,
 uucp
 www-data
