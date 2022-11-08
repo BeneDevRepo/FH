@@ -1,15 +1,16 @@
 1.1:
 
-Ein Konto hat 1 Guthaben.
-Ein Konto hat 1 Dispositionskredit.
-Ein Konto hat 1 Person.
-
 Eine Person hat 1 Vornamen.
 Eine Person hat 1 Nachnamen.
 
 Eine Person hat 0 bis n Konten.
 
 Ein Student ist eine Person.
+
+
+Ein Konto hat 1 Guthaben.
+Ein Konto hat 1 Dispositionskredit.
+Ein Konto hat 1 Person.
 
 Das Einzahlen auf ein Konto verändert (erhöht) dessen Guthaben.
 Das Abheben von einem Konto verändert (verringert) dessen Guthaben.
