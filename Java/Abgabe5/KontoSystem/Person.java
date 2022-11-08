@@ -24,11 +24,15 @@ public class Person {
 
 	/**
 	 * Fügt ein Konto zur Besitzliste dieser Person hinzu,
-	 * @param konto
+	 * @param konto Konto (nicht null)
 	 */
 	void addKonto(Konto konto) {
 		if(konto == null)
 			throw new IllegalArgumentException("Konnte konto null nicht zu Person hinzufügen.");
+
+		if(kontos.contains(konto))
+			return; // konto gehört dieser Person bereits
+
 		kontos.add(konto);
 	}
 

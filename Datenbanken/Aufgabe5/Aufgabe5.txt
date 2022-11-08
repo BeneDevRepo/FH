@@ -1,13 +1,53 @@
 
+2)
+db.runCommand(
+	{
+		insert: "Groups",
+		documents: [
+			{ _id: 1, Gruppenname: "Gruppe1" },
+			{ _id: 2, Gruppenname: "Gruppe2" },
+			{ _id: 3, Gruppenname: "Gruppe3" },
+			{ _id: 4, Gruppenname: "Gruppe4" },
+			{ _id: 5, Gruppenname: "Gruppe5" },
+		],
+		ordered: false
+	}
+);
+
+db.runCommand(
+	{
+		insert: "Users",
+		documents: [
+			{ _id:  1, Gruppenname: 1, Name: "Man",        Vorname: "Iron",    Adresse: "Strasse 1" },
+			{ _id:  2, Gruppenname: 1, Name: "Vader",      Vorname: "Darth",   Adresse: "Strasse 2" },
+			{ _id:  3, Gruppenname: 2, Name: "Skywalker",  Vorname: "Anakin",  Adresse: "Strasse 3" },
+			{ _id:  4, Gruppenname: 2, Name: "Skywalker",  Vorname: "Luke",    Adresse: "Strasse 4" },
+			{ _id:  5, Gruppenname: 3, Name: "Yoda",       Vorname: "Master",  Adresse: "Strasse 5" },
+			{ _id:  6, Gruppenname: 3, Name: "Ritchie",    Vorname: "Dennis",  Adresse: "Strasse 6" },
+			{ _id:  7, Gruppenname: 4, Name: "Kent",       Vorname: "Clark",   Adresse: "Strasse 7" },
+			{ _id:  8, Gruppenname: 4, Name: "Packard",    Vorname: "Hewlett", Adresse: "Strasse 8" },
+			{ _id:  9, Gruppenname: 5, Name: "Mustermann", Vorname: "Max",     Adresse: "Strasse 9" },
+			{ _id: 10, Gruppenname: 5, Name: "Johnsen",    Vorname: "John",    Adresse: "Strasse 10" },
+		],
+		ordered: false
+	}
+);
+
 3)
-group = db.Groups.findOne({Groupname: "Gruppe1"});
-members = db.Collection1.find({group: group._id}).limit(5000).toArray()
+group = db.Groups.findOne({Gruppenname: "Gruppe1"});
+members = db.Users.find({Gruppenname: group._id}).limit(5000).toArray()
+
+4)
+mongodump -d Praktikum5 --out=C:\Users\Admin\Desktop\FH\Datenbanken\Aufgabe5\dump
+mongorestore C:\Users\Admin\Desktop\FH\Datenbanken\Aufgabe5\dump
+
 
 
 5)
 a)
 Datenbanken in MongoDB bestehen aus Collections (ähnlich Tabellen).
 In diesen Collections werden Daten mittels BSON Dokumenten gespeichert.
+Dokumente speichern einzelne Datensätze
 
 b)
 JSON ist ein text-basiertes hierarchisches dateiformat.

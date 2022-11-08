@@ -13,6 +13,8 @@ public class Konto {
 	 * @param dispositionsKredit in cents
 	 */
 	public Konto(Person besitzer, long dispositionsKredit) {
+		if(besitzer == null)
+			throw new IllegalArgumentException("Konto ohne Besitzer nicht erlaubt!");
 		if(dispositionsKredit < 0)
 			throw new IllegalArgumentException("Negativer Dispositionskredit nucht erlaubt!");
 

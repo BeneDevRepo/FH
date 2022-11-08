@@ -23,33 +23,76 @@ public class Aufgabe5 {
 		System.out.println(konto);
 
 
-
-		// Exceptions testen:
-		System.out.print("Test: 1 Euro abheben (Überzieht Kreditlimit): ");
+		System.out.print("Testing Exceptions... ");
+		boolean error = false;
 		try {
-			exception = false;
-			konto.abheben(1 * EURO);
-		} catch (RuntimeException re) {
-			exception = true;
+			testExceptions();
+		} catch(RuntimeException e) {
+			error = true;
+			System.out.println("FAILED: " + e.getMessage());
 		}
-		System.out.println(exception ? "Erfolg: Exception geworfen" : "Fehler: Exception nicht geworfen");
+		if(!error)
+			System.out.println("Success!");
+	}
 
-		System.out.print("Test: Konto mit person=null: ");
+	private static void testExceptions() {
+		// ----- Person testen:
+		// Person ohne Vorname:
 		try {
-			exception = false;
+			new Person(null, "Mustermann");
+			throw new RuntimeException("Person mit vorname=null hat keine Exception geworfen!");
+		} catch (IllegalArgumentException e) {
+		}
+
+		// Person ohne Nachname:
+		try {
+			new Person("Max", null);
+			throw new RuntimeException("Person mit nachname=null hat keine Exception geworfen!");
+		} catch (IllegalArgumentException e) {
+		}
+
+		// ----- Konto testen:
+		// Konto ohne Person:
+		try {
 			new Konto(null);
-		} catch (RuntimeException re) {
-			exception = true;
+			throw new RuntimeException("Konto ohne Besitzer (besitzer=null) hat keine Exception geworfen!");
+		} catch (IllegalArgumentException e) {
 		}
-		System.out.println(exception ? "Erfolg: Exception geworfen" : "Fehler: Exception nicht geworfen");
-
-		System.out.print("Test: negativer Dispositionskredit: ");
+		
+		// Negativer Disposotopnskredit:
 		try {
-			exception = false;
-			new Konto(person, -1);
-		} catch (RuntimeException re) {
-			exception = true;
+			Person p = new Person("Max", "Mustermann");
+			new Konto(p, -1);
+			throw new RuntimeException("Konto mit negativem Dispositionskredit hat keine Exception geworfen!");
+		} catch (IllegalArgumentException e) {
 		}
-		System.out.println(exception ? "Erfolg: Exception geworfen" : "Fehler: Exception nicht geworfen");
+
+		// Konto Überziehen:
+		try {
+			Person p = new Person("Max", "Mustermann");
+			Konto k = new Konto(p, 500);
+			k.abheben(501 * EURO);
+			throw new RuntimeException("Konto überziehen hat keine Exception geworfen!");
+		} catch (IllegalArgumentException e) {
+		}
+		
+		// Negativen Wert abheben:
+		try {
+			Person p = new Person("Max", "Mustermann");
+			Konto k = new Konto(p);
+			k.einzahlen(100 * EURO);
+			k.abheben(-1 * EURO);
+			throw new RuntimeException("Negativen Betrag von Konto abheben hat keine Exception geworfen!");
+		} catch (IllegalArgumentException e) {
+		}
+		
+		// Negativen Wert einzahlen:
+		try {
+			Person p = new Person("Max", "Mustermann");
+			Konto k = new Konto(p);
+			k.einzahlen(-1 * EURO);
+			throw new RuntimeException("Negativen Betrag auf Konto einzahlen hat keine Exception geworfen!");
+		} catch (IllegalArgumentException e) {
+		}
 	}
 }
