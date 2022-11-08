@@ -1,0 +1,67 @@
+package KontoSystem;
+
+
+public class Konto {
+	private final Person besitzer;
+	private final long dispositionsKredit; // Dispositionskredit in cents
+
+	private long guthaben; // Guthaben in cents
+
+	/**
+	 * Erstellt ein Konto
+	 * @param besitzer des Kontos (nicht null)
+	 * @param dispositionsKredit in cents
+	 */
+	public Konto(Person besitzer, long dispositionsKredit) {
+		if(dispositionsKredit < 0)
+			throw new IllegalArgumentException("Negativer Dispositionskredit nucht erlaubt!");
+
+		this.besitzer = besitzer;
+		this.dispositionsKredit = dispositionsKredit;
+		this.guthaben = 0;
+
+		this.besitzer.addKonto(this);
+	}
+
+	/**
+	 * Erstellt ein Konto mit Dispositionskredit=0
+	 * @param besitzer des Kontos (nucht null)
+	 */
+	public Konto(Person besitzer) {
+		this(besitzer, 0);
+	}
+
+	/**
+	 * Zahlt <betrag> cents auf das Konto ein
+	 * @param betrag in cents
+	 */
+	public void einzahlen(long betrag) {
+		if(betrag < 0)
+			throw new IllegalArgumentException("Kann keinen negativen Wert anlegen!");
+
+		guthaben += betrag;
+	}
+
+	/**
+	 * Hebt <betrag> cents vom Konto ab (sofern möglich)
+	 * @param betrag
+	 */
+	public void abheben(long betrag) {
+		if(betrag < 0)
+			throw new IllegalArgumentException("Kann keinen negativen Wert abheben!");
+
+		if(guthaben - betrag < -dispositionsKredit)
+			throw new IllegalArgumentException("Konnte nicht abheben: Kredit überzogen!");
+
+		guthaben -= betrag;
+	}
+
+	@Override
+	public String toString() {
+		// return "Konto von " + besitzer + ", Guthaben " + guthaben + ", Dispo " + dispositionsKredit;
+		return String.format("Konto von %s, Guthaben %d.%d, Dispo %d.%d",
+			besitzer,
+			guthaben / 100, guthaben % 100,
+			dispositionsKredit / 100, dispositionsKredit % 100);
+	}
+}
