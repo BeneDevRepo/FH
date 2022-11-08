@@ -21,3 +21,4 @@ Student ist eine von Person abgeleitete Klasse.
 
 Konto ist eine Klasse mit einer Person (besitzer), Dispositionskredit und Guthaben als Attribut.
 Einzahlen und Abheben sind Methoden des Kontos.
+
