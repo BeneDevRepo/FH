@@ -1,6 +1,8 @@
 package KontoSystem;
 
-
+/**
+ * Repräsentiert ein Konto
+ */
 public class Konto {
 	private final Person besitzer;
 	private final long dispositionsKredit; // Dispositionskredit in cents
@@ -52,15 +54,17 @@ public class Konto {
 		if(betrag < 0)
 			throw new IllegalArgumentException("Kann keinen negativen Wert abheben!");
 
-		if(guthaben - betrag < -dispositionsKredit)
+		if(guthaben + dispositionsKredit < betrag)
 			throw new IllegalArgumentException("Konnte nicht abheben: Kredit überzogen!");
 
 		guthaben -= betrag;
 	}
 
+	/**
+	 * Erstellt einen beschreibenden String für dieses Konto aus Besitzer, Guthaben und Dsipositionskredit
+	 */
 	@Override
 	public String toString() {
-		// return "Konto von " + besitzer + ", Guthaben " + guthaben + ", Dispo " + dispositionsKredit;
 		return String.format("Konto von %s, Guthaben %d.%d, Dispo %d.%d",
 			besitzer,
 			guthaben / 100, guthaben % 100,

@@ -5,22 +5,38 @@ public class Aufgabe5 {
 	public static final int EURO = 100; // 1 Euro = 100 Cents
 
 	public static void main(String[] args) {
-		boolean exception; // true falls exception korrekt geworfen wurde
+		{
+			System.out.print("Person Erstellen: ");
+			Person person = new Person("Max", "Mustermann");
+			System.out.println(person);
 
-		Person person = new Person("Max", "Mustermann");
-		Konto konto = new Konto(person, 500 * EURO);
+			System.out.print("Konto Erstellen: ");
+			Konto konto = new Konto(person, 500 * EURO);
+			System.out.println(konto);
 
-		System.out.print("1000 Euro anlegen: ");
-		konto.einzahlen(1000 * EURO);
-		System.out.println(konto);
+			System.out.print("1000 Euro anlegen: ");
+			konto.einzahlen(1000 * EURO);
+			System.out.println(konto);
 
-		System.out.print("500 Euro abheben: ");
-		konto.abheben(500 * EURO);
-		System.out.println(konto);
-		
-		System.out.print("1000 Euro abheben: ");
-		konto.abheben(1000 * EURO);
-		System.out.println(konto);
+			System.out.print("500 Euro abheben: ");
+			konto.abheben(500 * EURO);
+			System.out.println(konto);
+
+			System.out.print("1000 Euro abheben: ");
+			konto.abheben(1000 * EURO);
+			System.out.println(konto);
+		}
+
+		System.out.println();
+		{
+			System.out.print("Student Erstellen: ");
+			Student student = new Student("Max", "Mustermann");
+			System.out.println(student);
+
+			System.out.print("Konto Erstellen: ");
+			Konto konto = new Konto(student, 500 * EURO);
+			System.out.println(konto);
+		}
 
 
 		System.out.print("Testing Exceptions... ");
