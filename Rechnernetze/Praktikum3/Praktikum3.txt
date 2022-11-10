@@ -1,0 +1,43 @@
+##########  Aufgabe 2:
+
+
+d)
+
+e)
+
+f)
+
+g)
+
+i)
+Traceroute sendet ICMP pakete mit variierenden TTL werten.
+Mit jedem Paket wird der TTl Wert um 1 inkrementiert.
+Nach <TTL> hops wird das paket gedroppt und das betroffene Gerät sendet eine ICMP-Fehlermeldung an den Absender zurück.
+
+
+
+##########  Aufgabe 3:
+
+
+
+f)
+
+g)
+
+h)
+
+i)
+
+j)
+
+
+
+
+
+
+
+
+
+
+
+

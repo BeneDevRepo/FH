@@ -1,0 +1,115 @@
+
+
+-- R1:
+enable
+configure terminal
+
+hostname R1
+no ip domain lookup
+
+line vty 0 4
+password cisco encrypted
+exit
+
+enable password class
+
+service password-encryption
+
+banner motd "Neues Banner" motd "Neue MOTD"
+
+
+interface range GigabitEthernet0/0 - 1
+shutdown
+exit
+
+interface GigabitEthernet0/0
+no shutdown
+ip address 172.16.30.1 255.255.255.0
+exit
+
+interface Serial 0/0/0
+no shutdown
+clock rate 64000
+ip address 172.16.20.1 255.255.255.0
+exit
+
+
+
+-- R2:
+enable
+configure terminal
+
+hostname R2
+no ip domain lookup
+
+line vty 0 4
+password cisco encrypted
+exit
+
+enable password class
+
+service password-encryption
+
+banner motd "Neues Banner" motd "Neue MOTD"
+
+
+interface range GigabitEthernet0/0 - 1
+shutdown
+exit
+
+
+interface GigabitEthernet0/0
+no shutdown
+ip address 172.16.10.1 255.255.255.0
+exit
+
+interface Serial0/0/0
+no shutdown
+clock rate 64000
+ip address 172.16.20.1 255.255.255.0
+exit
+
+interface Serial0/0/1
+no shutdown
+clock rate 64000
+ip address 192.168.50.1 255.255.255.0
+exit
+
+
+-- R3:
+enable
+configure terminal
+
+hostname R3
+no ip domain lookup
+
+line vty 0 4
+password cisco encrypted
+exit
+
+enable password class
+
+service password-encryption
+
+banner motd "Neues Banner" motd "Neue MOTD"
+
+
+interface range GigabitEthernet0/0 - 1
+shutdown
+exit
+
+
+interface GigabitEthernet0/0
+no shutdown
+ip address 172.16.40.1 255.255.255.0
+exit
+
+interface Serial0/0/1
+no shutdown
+clock rate 64000
+ip address 192.168.50.2 255.255.255.0
+exit
+
+
+
+

@@ -1,0 +1,115 @@
+
+
+-- R1:
+enable
+configure terminal
+
+hostname R1
+no ip domain lookup
+
+line vty 0 4
+password cisco encrypted
+exit
+
+enable password class
+
+service password-encryption
+
+banner motd "Neues Banner" motd "Neue MOTD"
+
+
+interface range GigabitEthernet0/0 - 1
+shutdown
+exit
+
+interface GigabitEthernet0/0
+no shutdown
+ipv6 address 2001:DB8:1:1::1/64
+exit
+
+interface Serial 0/0/0
+no shutdown
+clock rate 64000
+ipv6 address 2001:DB8:1:A001::1/64
+exit
+
+
+
+-- R2:
+enable
+configure terminal
+
+hostname R2
+no ip domain lookup
+
+line vty 0 4
+password cisco encrypted
+exit
+
+enable password class
+
+service password-encryption
+
+banner motd "Neues Banner" motd "Neue MOTD"
+
+
+interface range GigabitEthernet0/0 - 1
+shutdown
+exit
+
+
+interface GigabitEthernet0/0
+no shutdown
+ipv6 address 2001:DB8:1:2::1/64
+exit
+
+interface Serial0/0/0
+no shutdown
+clock rate 64000
+ipv6 address 2001:DB8:1:A001::2/64
+exit
+
+interface Serial0/0/1
+no shutdown
+clock rate 64000
+ipv6 address 2001:DB8:1:A002::1/64 
+exit
+
+
+-- R3:
+enable
+configure terminal
+
+hostname R3
+no ip domain lookup
+
+line vty 0 4
+password cisco encrypted
+exit
+
+enable password class
+
+service password-encryption
+
+banner motd "Neues Banner" motd "Neue MOTD"
+
+
+interface range GigabitEthernet0/0 - 1
+shutdown
+exit
+
+
+interface GigabitEthernet0/0
+no shutdown
+ipv6 address 2001:DB8:1:3::1/64 
+exit
+
+interface Serial0/0/1
+no shutdown
+clock rate 64000
+ipv6 address 2001:DB8:1:A002::2/64
+exit
+
+
+
+
