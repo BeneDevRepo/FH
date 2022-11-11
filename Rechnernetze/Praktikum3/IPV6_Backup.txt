@@ -1,0 +1,640 @@
+------------------------  Router 1:
+Building configuration...
+
+Current configuration : 1452 bytes
+!
+! Last configuration change at 12:14:07 UTC Thu Nov 10 2022
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable password 7 00071F071748
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+license udi pid CISCO2901/K9 sn FCZ1641C47D
+license boot module c2900 technology-package securityk9
+!
+!
+!
+redundancy
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ no ip address
+ duplex auto
+ speed auto
+ ipv6 address FE80::1 link-local
+ ipv6 address 2001:DB8:1:1::1/64
+!
+interface GigabitEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface Serial0/0/0
+ no ip address
+ ipv6 address 2001:DB8:1:A001::1/64
+!
+interface Serial0/0/1
+ no ip address
+ shutdown
+ clock rate 2000000
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+ipv6 route ::/0 Serial0/0/0
+ipv6 route ::/0 2001:DB8:1:A001::2
+!
+!
+!
+control-plane
+!
+!
+banner motd ^CNeues Banner^C
+!
+line con 0
+line aux 0
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ transport input all
+ transport output pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line vty 0 4
+ password 7 14141B180F0B6A2E2A2B212C32070212
+ login
+ transport input all
+!
+scheduler allocate 20000 1000
+!
+end
+
+
+
+------------------------  Router 2:
+
+Building configuration...
+
+Current configuration : 1404 bytes
+!
+! Last configuration change at 12:01:33 UTC Thu Nov 10 2022
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable password 7 110A15040401
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+license udi pid CISCO2901/K9 sn FCZ1641C47G
+license boot module c2900 technology-package securityk9
+!
+!
+!
+redundancy
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ ip address 192.168.40.1 255.255.255.0
+ duplex auto
+ speed auto
+ ipv6 address 2001:DB8:1:3::1/64
+!
+interface GigabitEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface Serial0/0/0
+ no ip address
+ shutdown
+ clock rate 2000000
+!
+interface Serial0/0/1
+ ip address 192.168.50.2 255.255.255.0
+ ipv6 address 2001:DB8:1:A002::2/64
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+!
+control-plane
+!
+!
+banner motd ^CNeues Banner^C
+!
+line con 0
+line aux 0
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ transport input all
+ transport output pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line vty 0 4
+ password 7 070C285F4D06590019111915143E2E20
+ login
+ transport input all
+!
+scheduler allocate 20000 1000
+!
+end
+
+R3#config
+Configuring from terminal, memory, or network [terminal]?
+Enter configuration commands, one per line.  End with CNTL/Z.
+R3(config)#interface Serial0/0/1
+R3(config-if)#no ip address
+R3(config-if)#exit
+R3(config)#interface Gig
+R3(config)#interface GigabitEthernet 0/0
+R3(config-if)#no ip address
+R3(config-if)#exit
+R3(config)#
+R3(config)#interface GigabitEthernet 0/0
+R3(config-if)#ipv6 add
+R3(config-if)#ipv6 address FE80:3 lin
+R3(config-if)#ipv6 address FE80:3 link
+R3(config-if)#ipv6 address FE80:3 ?
+  X:X:X:X::X/<0-128>  IPv6 prefix
+
+R3(config-if)#ipv6 address FE::3 ?
+  link-local  Use link-local address
+
+R3(config-if)#ipv6 address FE::3 link
+R3(config-if)#ipv6 address FE::3 link-local
+% Invalid link-local address
+R3(config-if)#ipv6 address FE80::3 link-local
+R3(config-if)#exit
+R3(config)#do show ip route
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2
+       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, * - candidate default, U - per-user static route
+       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
+       + - replicated route, % - next hop override
+
+Gateway of last resort is not set
+
+R3(config)#do show ipv6 route
+IPv6 Routing Table - default - 5 entries
+Codes: C - Connected, L - Local, S - Static, U - Per-user Static route
+       B - BGP, R - RIP, H - NHRP, I1 - ISIS L1
+       I2 - ISIS L2, IA - ISIS interarea, IS - ISIS summary, D - EIGRP
+       EX - EIGRP external, ND - ND Default, NDp - ND Prefix, DCE - Destination
+       NDr - Redirect, O - OSPF Intra, OI - OSPF Inter, OE1 - OSPF ext 1
+       OE2 - OSPF ext 2, ON1 - OSPF NSSA ext 1, ON2 - OSPF NSSA ext 2
+C   2001:DB8:1:3::/64 [0/0]
+     via GigabitEthernet0/0, directly connected
+L   2001:DB8:1:3::1/128 [0/0]
+     via GigabitEthernet0/0, receive
+C   2001:DB8:1:A002::/64 [0/0]
+     via Serial0/0/1, directly connected
+L   2001:DB8:1:A002::2/128 [0/0]
+     via Serial0/0/1, receive
+L   FF00::/8 [0/0]
+     via Null0, receive
+R3(config)#ip route ::/0 Serial0/1
+                    ^
+% Invalid input detected at '^' marker.
+
+R3(config)#ipv6 route ::/0 Serial0/1
+                                   ^
+% Invalid input detected at '^' marker.
+
+R3(config)#ipv6 route ::/0 Serial0/0/1
+R3(config)#
+R3(config)#do show ipv6 route
+IPv6 Routing Table - default - 6 entries
+Codes: C - Connected, L - Local, S - Static, U - Per-user Static route
+       B - BGP, R - RIP, H - NHRP, I1 - ISIS L1
+       I2 - ISIS L2, IA - ISIS interarea, IS - ISIS summary, D - EIGRP
+       EX - EIGRP external, ND - ND Default, NDp - ND Prefix, DCE - Destination
+       NDr - Redirect, O - OSPF Intra, OI - OSPF Inter, OE1 - OSPF ext 1
+       OE2 - OSPF ext 2, ON1 - OSPF NSSA ext 1, ON2 - OSPF NSSA ext 2
+S   ::/0 [1/0]
+     via Serial0/0/1, directly connected
+C   2001:DB8:1:3::/64 [0/0]
+     via GigabitEthernet0/0, directly connected
+L   2001:DB8:1:3::1/128 [0/0]
+     via GigabitEthernet0/0, receive
+C   2001:DB8:1:A002::/64 [0/0]
+     via Serial0/0/1, directly connected
+L   2001:DB8:1:A002::2/128 [0/0]
+     via Serial0/0/1, receive
+L   FF00::/8 [0/0]
+     via Null0, receive
+R3(config)#
+R1#
+R1#show ipv6 route
+IPv6 Routing Table - default - 6 entries
+Codes: C - Connected, L - Local, S - Static, U - Per-user Static route
+       B - BGP, R - RIP, H - NHRP, I1 - ISIS L1
+       I2 - ISIS L2, IA - ISIS interarea, IS - ISIS summary, D - EIGRP
+       EX - EIGRP external, ND - ND Default, NDp - ND Prefix, DCE - Destination
+       NDr - Redirect, O - OSPF Intra, OI - OSPF Inter, OE1 - OSPF ext 1
+       OE2 - OSPF ext 2, ON1 - OSPF NSSA ext 1, ON2 - OSPF NSSA ext 2
+S   ::/0 [1/0]
+     via 2001:DB8:1:A001::2
+     via Serial0/0/0, directly connected
+C   2001:DB8:1:1::/64 [0/0]
+     via GigabitEthernet0/0, directly connected
+L   2001:DB8:1:1::1/128 [0/0]
+     via GigabitEthernet0/0, receive
+C   2001:DB8:1:A001::/64 [0/0]
+     via Serial0/0/0, directly connected
+L   2001:DB8:1:A001::1/128 [0/0]
+     via Serial0/0/0, receive
+L   FF00::/8 [0/0]
+     via Null0, receive
+R1#
+R2(config-if)#
+R2(config-if)#do show ipv6 route
+IPv6 Routing Table - default - 7 entries
+Codes: C - Connected, L - Local, S - Static, U - Per-user Static route
+       B - BGP, R - RIP, H - NHRP, I1 - ISIS L1
+       I2 - ISIS L2, IA - ISIS interarea, IS - ISIS summary, D - EIGRP
+       EX - EIGRP external, ND - ND Default, NDp - ND Prefix, DCE - Destination
+       NDr - Redirect, O - OSPF Intra, OI - OSPF Inter, OE1 - OSPF ext 1
+       OE2 - OSPF ext 2, ON1 - OSPF NSSA ext 1, ON2 - OSPF NSSA ext 2
+C   2001:DB8:1:2::/64 [0/0]
+     via GigabitEthernet0/0, directly connected
+L   2001:DB8:1:2::1/128 [0/0]
+     via GigabitEthernet0/0, receive
+C   2001:DB8:1:A001::/64 [0/0]
+     via Serial0/0/0, directly connected
+L   2001:DB8:1:A001::2/128 [0/0]
+     via Serial0/0/0, receive
+C   2001:DB8:1:A002::/64 [0/0]
+     via Serial0/0/1, directly connected
+L   2001:DB8:1:A002::1/128 [0/0]
+     via Serial0/0/1, receive
+L   FF00::/8 [0/0]
+     via Null0, receive
+R2(config-if)#
+R2(config-if)#
+R2(config-if)#
+R2(config-if)#exit
+R2(config)#ipv6 route 2001:DB8:1:1::1/64 Serial0/0/0
+R2(config)#ipv6 route 2001:DB8:1:3::1/64 Serial0/0/1
+R2(config)#ping 2001:DB8:1:1::1
+            ^
+% Invalid input detected at '^' marker.
+
+R2(config)#do ping 2001:DB8:1:1::1
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 2001:DB8:1:1::1, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 24/27/28 ms
+R2(config)#do ping 2001:DB8:1:3::1
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 2001:DB8:1:3::1, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 28/28/28 ms
+R2(config)#do show run
+Building configuration...
+
+Current configuration : 1513 bytes
+!
+! Last configuration change at 14:11:55 UTC Thu Nov 10 2022
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable password 7 045807071C32
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+license udi pid CISCO2901/K9 sn FCZ1641C47F
+license boot module c2900 technology-package securityk9
+!
+!
+!
+redundancy
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ no ip address
+ duplex auto
+ speed auto
+ ipv6 address FE80::2 link-local
+ ipv6 address 2001:DB8:1:2::1/64
+!
+interface GigabitEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface Serial0/0/0
+ no ip address
+ ipv6 address 2001:DB8:1:A001::2/64
+ clock rate 64000
+!
+interface Serial0/0/1
+ no ip address
+ ipv6 address 2001:DB8:1:A002::1/64
+ clock rate 64000
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+ipv6 route 2001:DB8:1:1::/64 Serial0/0/0
+ipv6 route 2001:DB8:1:3::/64 Serial0/0/1
+!
+!
+!
+control-plane
+!
+!
+banner motd ^CNeues Banner^C
+!
+line con 0
+line aux 0
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ transport input all
+ transport output pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line vty 0 4
+ password 7 13061E010803442F25273A2A25361603
+ login
+ transport input all
+!
+scheduler allocate 20000 1000
+!
+end
+
+
+
+
+
+
+
+------------------------------   Router 3:
+
+
+Building configuration...
+
+Current configuration : 1417 bytes
+!
+! Last configuration change at 12:31:33 UTC Thu Nov 10 2022
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable password 7 110A15040401
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+license udi pid CISCO2901/K9 sn FCZ1641C47G
+license boot module c2900 technology-package securityk9
+!
+!
+!
+redundancy
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ no ip address
+ duplex auto
+ speed auto
+ ipv6 address FE80::3 link-local
+ ipv6 address 2001:DB8:1:3::1/64
+!
+interface GigabitEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface Serial0/0/0
+ no ip address
+ shutdown
+ clock rate 2000000
+!
+interface Serial0/0/1
+ no ip address
+ ipv6 address 2001:DB8:1:A002::2/64
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+ipv6 route ::/0 Serial0/0/1
+!
+!
+!
+control-plane
+!
+!
+banner motd ^CNeues Banner^C
+!
+line con 0
+line aux 0
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ transport input all
+ transport output pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line vty 0 4
+ password 7 070C285F4D06590019111915143E2E20
+ login
+ transport input all
+!
+scheduler allocate 20000 1000
+!
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

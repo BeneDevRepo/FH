@@ -3,25 +3,28 @@
 
 -- 1
 SELECT
-	B.Titel AS Buchtitel,
-	E.AnschDat AS angeschafft_am,
-	COUNT(E) AS Anzahl
+    B.Titel,
+    E.AnschDat AS angeschafft_am,
+    count(E.exid) AS Anzahl
 FROM Buch B
-INNER JOIN Exemplar E
-ON B.BuchOID = E.BuchOID
-GROUP BY E.AnschDat;
+NATURAL JOIN Exemplar E
+WHERE E.AnschDat IS NOT NULL
+GROUP BY E.exid
+ORDER by E.anschdat DESC;
 
 
 -- 2
-SELECT L.Nachname
+SELECT
+	L.Nachname
 FROM Leser L
 INNER JOIN Ausleihe LA
+	ON L.LeserOID = LA.LeserOID
 INNER JOIN Ausleihe SA
+	ON LA.BuchOID = SA.BuchOID
 INNER JOIN Leser S
-ON L.LeserOID = LA.LeserOID
-AND S.LeserOID = SA.LeserOID
-AND LA.BuchOID = SA.BuchOID
-AND NOT L.LeserOID = S.LeserOID
+	ON S.Nachname = 'Schmitz'
+	AND S.LeserOID = SA.LeserOID
+	AND NOT L.LeserOID = S.LeserOID
 GROUP BY L.LeserOID;
 
 
@@ -29,34 +32,36 @@ GROUP BY L.LeserOID;
 SELECT
 	B.Titel AS Titel,
 	M.Datum AS MahnDatum
-FROM Mahnung M
-INNER JOIN Buch B
+FROM Buch B
+LEFT JOIN Mahnung M
 ON M.BuchOID = B.BuchOID;
 
 
 -- 4
 SELECT
-	L.Nachnahme AS Nachname,
-	IIF(SUM(M.Betrag) > 0, SUM(M.Betrag), "kein Betrag offen") AS Betrag
+    L.Nachname AS Nachname
+    SUM(M.Betrag)
+    IIF(SUM(M.Betrag) > 0, SUM(M.Betrag), 'kein Betrag offen') AS Betrag
 FROM Leser L
 INNER JOIN Mahnung M
-ON L.LeserOID = M.LeserOID
-WHERE M.Betrag IS NOT NULL
+	ON L.LeserOID = M.LeserOID
+WHERE M.Betrag IS NOT NULL;
 GROUP BY L.LeserOID;
 
 
 -- 5
 SELECT
-	MAX(A.RDat) AS RDatum
+	A.ExID AS Exemplar,
+    MAX(A.RDat) AS RDatum
 FROM Ausleihe A
 INNER JOIN Buch B
-	ON B.BuchOID = A.BuchOID
+    ON B.BuchOID = A.BuchOID
 INNER JOIN Leser L
-	ON L.LeserOID = A.LeserOID
-WHERE B.Titel = "Grundlagen von DB Systemen"
-	AND B.Verfasser = "Elmasri"
-	AND L.Nachname = "Schmitz"
-GROUP BY A.ExID
+    ON L.LeserOID = A.LeserOID
+WHERE B.Titel = 'Grundlagen von DB Systemen'
+    AND B.Verfasser = 'Elmasri'
+    AND L.Nachname = 'Schmitz'
+GROUP BY A.ExID;
 ORDER BY A.RDat DESC;
 
 
@@ -64,15 +69,15 @@ ORDER BY A.RDat DESC;
 SELECT B.Titel AS Titel
 FROM Buch B
 INNER JOIN Mahnung M
-	ON M.BuchOID = B.BuchOID
+    ON M.BuchOID = B.BuchOID;
 GROUP BY B.BuchOID
-ORDER BY COUNT(M) DESC;
+ORDER BY COUNT(M.exid) DESC;
 
 
 -- 7
 SELECT
 	L.Nachname AS Nachname,
-	IIF(COUNT(V) > 0, V.VormDat, "Keine Vormerkung") AS Vormerkung
+	IIF(COUNT(V) > 0, V.VormDat, 'Keine Vormerkung') AS Vormerkungen
 FROM Leser L
 LEFT JOIN Vormerkung V
 	ON V.LeserOID = L.LeserOID
