@@ -2,12 +2,8 @@
 
 
 d)
+Die Routen der standard-Interfaces
 
-e)
-
-f)
-
-g)
 
 i)
 Traceroute sendet ICMP pakete mit variierenden TTL werten.
