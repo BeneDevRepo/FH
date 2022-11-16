@@ -13,23 +13,23 @@ WHERE B.BuchOID NOT IN (
 
 -- 2:
 SELECT
-	B.Titel AS Titel,
-	E.ExID AS Exemplar
+    B.Titel AS Titel,
+    E.ExID AS Exemplar
 FROM Buch B, Exemplar E
 WHERE B.BuchOID = E.BuchOID
 AND E.ExID IN (
-	SELECT ExID
-	FROM Ausleihe
-	WHERE EXTRACT(DAY FROM RDat - CURRENT_DATE) > 14
+    SELECT A.ExID
+    FROM Ausleihe A
+    WHERE DATEADD(DAY, 14, CURRENT_DATE) < A.RDat
 );
 
 -- 3:
 SELECT B.Titel
 FROM Buch B
 WHERE B.BuchOID IN (
-	SELECT BuchOID
-	FROM Exemplar
-	WHERE AnschDat = MAX(AnschDat)
+    SELECT BuchOID
+    FROM Exemplar
+    WHERE AnschDat = (SELECT MIN(AnschDat) FROM Exemplar)
 );
 
 -- 4:
@@ -38,7 +38,7 @@ FROM Buch B
 WHERE B.BuchOID = ANY (
 	SELECT BuchOID
 	FROM Mahnung
-	WHERE AnschDat > '2012-10-15'
+	WHERE Datum > '2012-10-15'
 );
 
 -- 5:
@@ -46,20 +46,22 @@ SELECT B.Titel
 FROM Buch B
 WHERE B.BuchOID IN (
 	SELECT E.BuchOID
-	FROM Exemplar E, Vormerkung V
-	WHERE E.BuchOID = V.BuchOID
-		AND MIN(V.VormDat) < MIN(E.AnschDat)
-	GROUP BY E.BuchOID
+	FROM Exemplar E
+	WHERE E.AnschDat > ANY (
+		SELECT V.VormDat
+		FROM Vormerkung V
+		WHERE E.BuchOID = V.BuchOID
+	)
 );
 
 -- 6:
 SELECT
-	L.Nachname AS Name,
-	COUNT(
-		SELECT *
-		FROM Ausleihe A
-		WHERE A.LeserOID = L.LeserOID
-	) AS AnzahlAusleihen
+    L.Nachname AS Name,
+    (
+        SELECT COUNT(A.LeserOID)
+        FROM Ausleihe A
+        WHERE A.LeserOID = L.LeserOID
+    ) AS AnzahlAusleihen
 FROM Leser L;
 
 -- 7:
