@@ -1,6 +1,6 @@
 #include "DbCLI.hpp"
 
-#include "Parser.hpp"
+#include "SQLParser.hpp"
 
 #include "util.hpp"
 
@@ -16,13 +16,28 @@ void DbCLI::run() {
 	std::cout << "BeneSQL CLI [version 1.0.0]\n\n";
 
 	std::string input;
+	const auto getCmd =
+		[&input]() -> std::string {
+			for(;;) {
+				std::cout << " > ";
+				input += " " + readLine();
+
+				for(size_t i = 0; i < input.size(); i++) {
+					if(input[i] == ';') {
+						const std::string& command = input.substr(0, i);
+						input = input.substr(i + 1, input.size() - (i + 1));
+						return command;
+					}
+				}
+			}
+		};
 
 	for(bool stop = false; !stop; ) {
-		std::cout << " > ";
-		input += readLine();
+		const std::string command = getCmd();
+		std::cout << "Command: " << command << "\n";
 
 		// std::cout << " << " << input << "\n";
-		COMMAND_STATE state = checkCMD(input);
+		COMMAND_STATE state = checkCMD(command);
 		switch(state) {
 			case COMMAND_STATE::OK:
 				// Command is valid: execute:
@@ -81,9 +96,9 @@ DbCLI::COMMAND_STATE DbCLI::checkCMD(const std::string& input) const {
 	};
 
 	static const std::string SELECT = "SELECT (column+:column|*) FROM Buch";
-	size_t index;
-	for(;;) {
-		const char c = input.at(index++);
-	}
+	// size_t index;
+	// for(;;) {
+	// 	const char c = input.at(index++);
+	// }
 	return COMMAND_STATE::WAITING;
 }
