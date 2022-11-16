@@ -1,0 +1,113 @@
+
+
+
+
+3.1:
+groups root: root
+groups student: cdrom, floppy, audio, video
+uid: 0, gid: 0
+Gruppen: 
+Nummern:
+
+
+
+3.2:
+ps <root>: alle vordergrund-Prozesse mit Konsole anzeigen
+ps <user>: alle vordergrund-Prozesse des Nutzers anzeigen
+ps a <root>: Alle Prozesse mit Konsole anzeigen
+ps au: ps a + Nutzer-spalte
+ps x: auch Prozesse ohne tty anzeigen
+ps aux: alle Prozesse + nutzer anzeigen
+
+ps -e --no-header | wc -l
+
+PID: 448
+
+yes > /dev/null
+yes: wird verwendet, umalle Optionen eines cli's mit ja zu beantworten
+Befehl: output von yes wird ins null-device ungeleitet und mit & im Hintergrund ausgeführt
+
+
+
+3.3.1:
+sleep 10: 10 sekunden warten
+sleep 10 &: 10 sekunden im hintergrund warten
+
+ls -lR /usr > usr.list &
+ps
+fg
+
+
+3.3.2:
+touch feb86 jan12.89 jan19.89 jan26.89 jan5.89 jan85 jan86 jan87 jan88 mar88 memo1 memo10 memo2 memo2.sv
+
+echo *		-> alle Dateien ausgeben
+echo *[0-9]		-> alle Dateinamen die auf eine Ziffer enden
+echo m[a-df-z]	-> alle Dateinamen die mit m und einem Buchstaben ausser e beginnen
+echo jan*		-> alle Dateinamen die mit jan beginnen
+echo *.*		-> alle Dateinamen die einen Punkt enthalten
+echo ?????		-> alle Dateinamen mit 5 Zeichen
+echo *89		-> alle Dateinamen die auf 89 enden
+echo jan?? feb?? mar??	-> alle Dateinamen die aus jan, feb oder mar und je 2 weiteren Buchstaben bestehen
+echo [fjm][ae][bnr]*	-> alle Dateien die mit jan, feb, mar beginnen
+
+
+
+3.3.3:
+touch "stars*"
+touch stars1
+touch stars2
+touch ./-top
+touch "helllo my friend"
+touch "\"goodbye\""
+
+rm "stars*"
+rm stars1
+rm stars2
+rm ./-top
+rm "helllo my friend"
+rm "\"goodbye\""
+
+
+3.3.4:
+root: Deutsch
+normal: Deutsch
+
+LC_ALL=
+
+touch a b c x y z A B C X Y Z ä ö ü Ä Ö Ü
+echo * : alles
+echo [a-z]* : a A b B c C x X y Y z
+echo [A-Z]* : A b B c C x X y Y z Z
+find * : alles, umlaute: ??
+
+englisch:
+echo * : alles
+echo [a-z]* : a b c x y z
+echo [A-Z]* : A B C X Y Z
+find * : alles, umlaute: ??
+
+
+
+3.3.5:
+cut -d: -f1 /etc/passwd | sort -d > benutzer.txt
+
+grep -ec "*bash*" < /etc/passwd
+grep -ec "*bash*" /etc/passwd
+
+
+3.4:
+mit -name: Verzeichnisse dürfen keinen Punkt enthalten
+ohne: Verzeichnisse dürfen . enthalten
+
+
+
+
+
+
+
+
+
+
+
+
