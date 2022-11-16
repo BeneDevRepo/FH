@@ -1,0 +1,10 @@
+1.1)
+Test mit 100Mio Elementen:
+
+Type       |  Time
+-----------+----------
+Index      |   1538 ms
+Iterator   |   1482 ms
+Foreach    |   1498 ms
+
+-> Der Index-basierte Zugriff ist am langsamsten, da
