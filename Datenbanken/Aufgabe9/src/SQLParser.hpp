@@ -1,5 +1,6 @@
 #pragma once
 
+#include <initializer_list>
 #include <string_view>
 #include <cstdint>
 #include <string>
@@ -32,7 +33,7 @@ public:
 class SQLToken {
 public:
 	virtual ~SQLToken(){}
-	virtual bool parse(SQLParseResult& result, const std::string& source, const size_t start) const = 0;
+	virtual bool parse(SQLParseResult& result, const std::string& source, size_t& index) const = 0;
 };
 
 class SQLLiteral : public SQLToken {
@@ -41,13 +42,35 @@ private:
 
 public:
 	inline SQLLiteral(const std::string& literal): literal(literal) {}
-	inline virtual bool parse(SQLParseResult& result, const std::string& source, const size_t start) const {
+	inline virtual bool parse(SQLParseResult& result, const std::string& source, size_t& index) const {
 		for(size_t i = 0; i < literal.size(); i++) {
-			if(start + i >= source.size()) {
+			if(index + i >= source.size()) {
 				return false;
 			}
 
-			if(tolower(literal[i]) != tolower(source[start + i])) {
+			if(tolower(literal[i]) != tolower(source[index + i])) {
+				return false;
+			}
+		}
+
+		index += literal.size();
+
+		return true;
+	}
+};
+
+class SQLCommand : public SQLToken {
+private:
+	std::vector<std::unique_ptr<SQLToken>> parts;
+
+public:
+	// inline SQLCommand(std::initializer_list<std::unique_ptr<SQLToken>> parts): parts(parts) {}
+	inline SQLCommand(std::vector<std::unique_ptr<SQLToken>> parts): parts(parts) {}
+	inline virtual bool parse(SQLParseResult& result, const std::string& source, size_t& index) const {
+		const size_t index_orig = index;
+		for(auto part = parts.begin(); part != parts.end(); ++part) {
+			if(!(*part)->parse(result, source, index)) {
+				index = index_orig;
 				return false;
 			}
 		}
@@ -67,11 +90,13 @@ public:
 		commands.push_back(std::make_unique<SQLLiteral>("INSERT"));
 	}
 
-	inline bool parse(SQLParseResult& result, const std::string& source, const size_t start) {
+	inline bool parse(SQLParseResult& result, const std::string& source, size_t start) {
 		for(const std::unique_ptr<SQLToken>& command : commands) {
-			if(command->parse(source, start)) {
+			if(command->parse(result, source, start)) {
 				return true;
 			}
 		}
+
+		return false;
 	}
 };
