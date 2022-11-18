@@ -58,47 +58,56 @@ void DbCLI::run() {
 }
 
 DbCLI::COMMAND_STATE DbCLI::checkCMD(const std::string& input) const {
-	struct MatchResult {
-		bool success;
-		std::string error;
-		size_t index; // problematic index
-		inline MatchResult():
-			success(true) {}
-		inline MatchResult(const size_t index, const std::string& error):
-			success(false), error(error), index(index) { }
-	};
+	// struct MatchResult {
+	// 	bool success;
+	// 	std::string error;
+	// 	size_t index; // problematic index
+	// 	inline MatchResult():
+	// 		success(true) {}
+	// 	inline MatchResult(const size_t index, const std::string& error):
+	// 		success(false), error(error), index(index) { }
+	// };
 
-	struct Token {
-		enum Type {
-			LITERAL,
-			NAME
-		};
-		Type type;
-		std::string _content;
-		static inline Token Literal(const std::string& literal) { return { .type = LITERAL, ._content = literal }; }
-		static inline Token Name() { return { .type = NAME }; }
-		inline MatchResult test(const std::string& command, size_t index) {
-			constexpr auto isLetter = [](const char c){ return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); };
-			constexpr auto isNumber = [](const char c){ return c >= '0' && c <= '9'; };
-			switch(type) {
-				case LITERAL:
-					for(size_t i = 0; i < _content.size(); i++)
-						if(command [index + i] != _content[i])
-							return MatchResult(index + i, "Substitution failed: missmatched literal");
-					return MatchResult();
+	// struct Token {
+	// 	enum Type {
+	// 		LITERAL,
+	// 		NAME
+	// 	};
+	// 	Type type;
+	// 	std::string _content;
+	// 	static inline Token Literal(const std::string& literal) { return { .type = LITERAL, ._content = literal }; }
+	// 	static inline Token Name() { return { .type = NAME }; }
+	// 	inline MatchResult test(const std::string& command, size_t index) {
+	// 		constexpr auto isLetter = [](const char c){ return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); };
+	// 		constexpr auto isNumber = [](const char c){ return c >= '0' && c <= '9'; };
+	// 		switch(type) {
+	// 			case LITERAL:
+	// 				for(size_t i = 0; i < _content.size(); i++)
+	// 					if(command [index + i] != _content[i])
+	// 						return MatchResult(index + i, "Substitution failed: missmatched literal");
+	// 				return MatchResult();
 
-				case NAME:
-					for(size_t i = 0; isLetter(command[index + i]) || (i > 0 && isNumber(index + i)); i++)
-						;
-					break;
-			}
-		}
-	};
+	// 			case NAME:
+	// 				for(size_t i = 0; isLetter(command[index + i]) || (i > 0 && isNumber(index + i)); i++)
+	// 					;
+	// 				break;
+	// 		}
+	// 	}
+	// };
 
-	static const std::string SELECT = "SELECT (column+:column|*) FROM Buch";
+	// static const std::string SELECT = "SELECT (column+:column|*) FROM Buch";
 	// size_t index;
 	// for(;;) {
 	// 	const char c = input.at(index++);
 	// }
+
+	SQLParser parser;
+
+
+	SQLParseResult result;
+	if(parser.parse(result, input, 0)) {
+		return COMMAND_STATE::OK;
+	}
+	
 	return COMMAND_STATE::WAITING;
 }
