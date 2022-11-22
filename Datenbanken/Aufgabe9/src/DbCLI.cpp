@@ -5,26 +5,19 @@
 #include "util.hpp"
 
 
-DbCLI::DbCLI():
-	db() {
-}
-
-DbCLI::~DbCLI() {
-}
-
 void DbCLI::run() {
 	std::cout << "BeneSQL CLI [version 1.0.0]\n\n";
 
 	std::string input;
 	const auto getCmd =
 		[&input]() -> std::string {
-			for(;;) {
-				std::cout << " > ";
+			for(size_t line = 0; ; line++) {
+				std::cout << (line == 0 ? ">> " : " > ");
 				input += " " + readLine();
 
 				for(size_t i = 0; i < input.size(); i++) {
 					if(input[i] == ';') {
-						const std::string& command = input.substr(0, i);
+						const std::string& command = input.substr(0, i + 1); // extract command (including ;)
 						input = input.substr(i + 1, input.size() - (i + 1));
 						return command;
 					}
@@ -34,22 +27,19 @@ void DbCLI::run() {
 
 	for(bool stop = false; !stop; ) {
 		const std::string command = getCmd();
-		std::cout << "Command: " << command << "\n";
+		// std::cout << "Command: " << command << "\n";
 
 		// std::cout << " << " << input << "\n";
 		COMMAND_STATE state = checkCMD(command);
 		switch(state) {
 			case COMMAND_STATE::OK:
 				// Command is valid: execute:
-				std::cout << " <<< " << "Success" << "\n";
+				std::cout << "<< " << "Success" << "\n";
 				break;
 
-			case COMMAND_STATE::WAITING:
-				// Command is neither finished nor wrong: ignore
-				break;
 			case COMMAND_STATE::ERROR:
 				// Command is invalid: ERROR:
-				std::cout << " <<< " << "ERROR" << "\n";
+				std::cout << "<< " << "ERROR" << "\n";
 				break;
 		}
 	}
@@ -109,5 +99,5 @@ DbCLI::COMMAND_STATE DbCLI::checkCMD(const std::string& input) const {
 		return COMMAND_STATE::OK;
 	}
 	
-	return COMMAND_STATE::WAITING;
+	return COMMAND_STATE::ERROR;
 }
