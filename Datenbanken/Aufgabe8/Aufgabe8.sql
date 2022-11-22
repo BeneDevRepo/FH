@@ -2,11 +2,11 @@
 
 -- 1:
 SELECT
-	(
-		SELECT COUNT(M.MOID)
-		FROM Mahnung M
-		WHERE M.Datum = DATEADD(DAY, 1, A.RDat)
-	) * 100 / COUNT(A.LNr) AS Prozent
+    (
+        SELECT COUNT(M.MahnungOID)
+        FROM Mahnung M
+        WHERE DATEDIFF(DAY, M.Datum, A.RDat) = 1
+    ) * 100 / COUNT(A.LNr) AS Prozent
 FROM Ausleihe A;
 
 
@@ -31,24 +31,25 @@ WHERE
 
 -- 3:
 SELECT 
-	Titel,
-	Exemplar
+	S.Titel,
+	S.Exemplar
 FROM (
 		SELECT
 			E.ExID AS Exemplar,
-			E.AnschBetrag AS Preis
+			E.AnschBetrag AS Preis,
 			(SELECT SUM(M.Betrag) FROM Mahnung M WHERE M.ExID = E.ExID GROUP BY M.ExID) AS Strafe,
 			(SELECT B.Titel FROM Buch B WHERE B.BuchOID = E.BuchOID) AS Titel
 		FROM Exemplar E
-	)
-WHERE Strafe > AnschBetrag;
+	) S
+WHERE S.Strafe > S.Preis;
 
 
 -- 4:
 SELECT Name
 FROM (
-	SELECT
-		L.Nachname AS Name
+		SELECT
+			L.Nachname AS Name
+		FROM Leser L
 		WHERE (
 			SELECT COUNT(V.BuchOID)
 			FROM Vormerkung V
@@ -64,15 +65,14 @@ FROM (
 				)
 			GROUP BY V.BuchOID
 		) > 0
-	)
-);
+	);
 
 
 -- 5:
 SELECT
 	(SELECT B.Titel FROM Buch B WHERE B.BuchOID = E.BuchOID) AS Buchtitel,
 	E.ExID AS ExID,
-	(SELECT IIF(COUNT(A.LNr)>0, "ausgeliehen", "nicht ausgeliehen") FROM Ausleihe A WHERE A.ADat <= CURRENT_DATE AND A.RDAT >= CURRENT_DATE) AS Status
+	(SELECT IIF(COUNT(A.LNr)>0, 'ausgeliehen', 'nicht ausgeliehen') FROM Ausleihe A WHERE A.ADat <= CURRENT_DATE AND A.RDAT >= CURRENT_DATE) AS Status
 FROM Exemplar E;
 
 
@@ -80,7 +80,7 @@ FROM Exemplar E;
 SELECT
 	B.Titel,
 	E.ExID AS ExID,
-	(SELECT IIF(COUNT(A.LNr)>0, "ausgeliehen", "nicht ausgeliehen") FROM Ausleihe A WHERE A.ADat <= CURRENT_DATE AND A.RDAT >= CURRENT_DATE) AS Status
+	(SELECT IIF(COUNT(A.LNr)>0, 'ausgeliehen', 'nicht ausgeliehen') FROM Ausleihe A WHERE A.ADat <= CURRENT_DATE AND A.RDAT >= CURRENT_DATE) AS Status
 FROM Exemplar E
 INNER JOIN Buch B
 ON B.BuchOID = E.BuchOID;
