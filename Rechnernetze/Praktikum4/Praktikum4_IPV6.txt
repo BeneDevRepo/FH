@@ -1,0 +1,420 @@
+################  Router 2
+
+
+R1#show run
+Building configuration...
+
+Current configuration : 1679 bytes
+!
+! Last configuration change at 12:27:11 UTC Thu Nov 24 2022
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable password 7 00071F071748
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+ipv6 unicast-routing
+ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+license udi pid CISCO2901/K9 sn FCZ1641C47D
+license boot module c2900 technology-package securityk9
+!
+!
+!
+redundancy
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 172.16.224.1 255.255.240.0
+ ipv6 address 2001:DB8:D112:3::1/64
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ ip address 172.16.240.1 255.255.248.0
+ duplex auto
+ speed auto
+ ipv6 address FE80::1 link-local
+ ipv6 address 2001:DB8:D112:4::1/64
+!
+interface GigabitEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface Serial0/0/0
+ ip address 172.16.254.1 255.255.255.252
+ ipv6 address 2001:DB8:D112:8::2/64
+ clock rate 64000
+!
+interface Serial0/0/1
+ ip address 172.16.255.2 255.255.255.0
+ clock rate 2000000
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+ip route 172.16.128.0 255.255.128.0 Serial0/0/0
+!
+ipv6 route 2001:DB8:D112::/60 Serial0/0/0
+!
+!
+!
+control-plane
+!
+!
+banner motd ^CNeues Banner^C
+!
+line con 0
+line aux 0
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ transport input all
+ transport output pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line vty 0 4
+ password 7 00071A1507544B0301225E57190D0013
+ login
+ transport input all
+!
+scheduler allocate 20000 1000
+!
+end
+
+
+
+
+
+
+
+
+
+
+
+
+##################  Router 2
+
+R2(config)#do show run
+Building configuration...
+
+Current configuration : 2069 bytes
+!
+! Last configuration change at 14:12:44 UTC Thu Nov 24 2022
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable password 7 0822404F1A0A
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+ipv6 unicast-routing
+ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+license udi pid CISCO2901/K9 sn FCZ1641C47F
+license boot module c2900 technology-package securityk9
+!
+!
+!
+redundancy
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no ip address
+ shutdown
+!
+interface Loopback1
+ ip address 172.16.192.1 255.255.224.0
+ ipv6 address 2001:DB8:D112:2::1/64
+!
+interface Loopback2
+ no ip address
+ shutdown
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ ip address 172.16.128.1 255.255.192.0
+ duplex auto
+ speed auto
+ ipv6 address FE80::2 link-local
+ ipv6 address 2001:DB8:D112:1::1/64
+!
+interface GigabitEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface Serial0/0/0
+ ip address 172.16.254.2 255.255.255.252
+ ipv6 address 2001:DB8:D112:8::1/64
+!
+interface Serial0/0/1
+ ip address 172.16.255.1 255.255.255.252
+ ipv6 address 2001:DB8:D112:9::1/64
+ clock rate 64000
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+ip route 172.16.224.0 255.255.240.0 Serial0/0/0
+ip route 172.16.240.0 255.255.248.0 Serial0/0/0
+ip route 172.16.248.0 255.255.252.0 Serial0/0/1
+ip route 172.16.252.0 255.255.254.0 Serial0/0/1
+!
+ipv6 route 2001:DB8:D112:3::/64 Serial0/0/0
+ipv6 route 2001:DB8:D112:4::/64 Serial0/0/0
+ipv6 route 2001:DB8:D112:5::/64 Serial0/0/1
+ipv6 route 2001:DB8:D112:6::/64 Serial0/0/1
+!
+!
+!
+control-plane
+!
+!
+banner motd ^CNeues Banner^C
+!
+line con 0
+line aux 0
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ transport input all
+ transport output pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line vty 0 4
+ password 7 1511021F07256B212630273B03131307
+ login
+ transport input all
+!
+scheduler allocate 20000 1000
+!
+end
+
+
+
+
+
+
+###########################  3
+
+
+
+R3#show run
+Building configuration...
+
+Current configuration : 1718 bytes
+!
+! Last configuration change at 12:22:11 UTC Thu Nov 24 2022
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable password 7 070C2D4D5D1A
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+ipv6 unicast-routing
+ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+license udi pid CISCO2901/K9 sn FCZ1641C47G
+license boot module c2900 technology-package securityk9
+!
+!
+!
+redundancy
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 172.16.224.1 255.255.240.0
+ shutdown
+!
+interface Loopback2
+ ip address 172.16.248.1 255.255.252.0
+ ipv6 address 2001:DB8:D112:5::1/64
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ ip address 172.16.252.1 255.255.254.0
+ duplex auto
+ speed auto
+ ipv6 address FE80::3 link-local
+ ipv6 address 2001:DB8:D112:6::1/64
+!
+interface GigabitEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface Serial0/0/0
+ no ip address
+ shutdown
+ clock rate 2000000
+!
+interface Serial0/0/1
+ ip address 172.16.255.2 255.255.255.252
+ ipv6 address 2001:DB8:D112:9::2/64
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+ip route 172.16.128.0 255.255.128.0 Serial0/0/1
+!
+ipv6 route 2001:DB8:D112::/60 Serial0/0/1
+!
+!
+!
+control-plane
+!
+!
+banner motd ^CNeues Banner^C
+!
+line con 0
+line aux 0
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ transport input all
+ transport output pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line vty 0 4
+ password 7 0822455D0A1645121C081E1D3A3F212C
+ login
+ transport input all
+!
+scheduler allocate 20000 1000
+!
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
