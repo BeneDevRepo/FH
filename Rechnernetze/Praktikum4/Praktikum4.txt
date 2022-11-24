@@ -1,0 +1,186 @@
+
+
+1)
+a) -
+b)
+enable
+configure terminal
+
+hostname R1
+no ip domain lookup
+
+line vty 0 4
+password cisco encrypted
+exit
+
+enable password class
+
+service password-encryption
+
+banner motd "Neues Banner" motd "Neue MOTD"
+
+
+interface range GigabitEthernet0/0 - 1
+shutdown
+exit
+
+
+interface range Serial 0/0/0 - 1
+shutdown
+exit
+
+
+
+3)
+Addressblock 172.16.128.0/17  ->  15Bit addressraum
+10101100.00010000.1 | 000000.00000000/17
+
+a)
+Anzahl Hostaddresssen = 2^15 = 32768
+Anzahl benötigt = 16000 + 8000 + 4000 + 2000 + 1000 + 500 = 31500
+-> 31500 < 32000 (Es stehen ausreichend Addressen zur Verfügung
+
+b)
+2^14 > 16000
+2^13 >  8000
+2^12 >  4000
+2^11 >  2000
+2^10 >  1000
+2^ 9 >   500
+
+16k Hosts:
+14 bit addressraum, 18 bit Netzwerkadresse
+Netzwerkadresse = 10101100.00010000.10|000000.00000000 / 18
+ = 172.16.128.0/18
+Erste Addresse = 10101100.00010000.10|000000.00000001 / 18
+ = 172.16.128.1/18
+BC Addresse = 10101100.00010000.10|111111.11111111 / 18
+ = 172.16.191.255/18
+Rest:
+Netzwerkadresse = 10101100.00010000.11|000000.00000000 / 18
+ = 172.16.192.0/18
+
+
+8k Hosts:
+13 bit addressraum, 19 bit Netzwerkadresse
+Netzwerkadresse = 10101100.00010000.110|00000.00000000 / 19
+ = 172.16.192.0/19
+Erste Adresse = 10101100.00010000.110|00000.00000001 / 19
+ = 172.16.192.1/19
+BC Adresse = 10101100.00010000.110|11111.11111111 / 19
+ = 172.16.223.255/19
+Rest:
+Netzwerkname = 10101100.00010000.111|00000.00000000 / 19
+ = 172.16.224.0/19
+
+
+4k Hosts:
+12 bit addressraum, 20 bit Netzwerkadresse
+Netzwerkadresse = 10101100.00010000.1110|0000.00000000 / 20
+ = 172.16.224.0/20
+Erste Adresse = 10101100.00010000.1110|0000.00000001 / 20
+ = 172.16.224.1/20
+BC Adresse = 10101100.00010000.1110|1111.11111111 / 20
+ = 172.16.239.255/20
+Rest:
+Netzwerkname = 10101100.00010000.1111|0000.00000000 / 20
+ = 172.16.240.0/20
+
+
+2k Hosts:
+11 bit addressraum, 21 bit Netzwerkadresse
+Netzwerkadresse = 10101100.00010000.11110|000.00000000 / 21
+ = 172.16.240.0/21
+Erste Adresse = 10101100.00010000.11110|000.00000001 / 21
+ = 172.16.240.1/21
+BC Adresse = 10101100.00010000.11110|111.11111111 / 21
+ = 172.16.247.255/21
+Rest:
+Netzwerkname = 10101100.00010000.11111|000.00000000 / 21
+ = 172.16.248.0/21
+
+
+1k Hosts:
+10 bit addressraum, 22 bit Netzwerkadresse
+Netzwerkadresse = 10101100.00010000.111110|00.00000000 / 22
+ = 172.16.248.0/22
+Erste Adresse = 10101100.00010000.111110|00.00000001 / 22
+ = 172.16.248.1/22
+BC Adresse = 10101100.00010000.111110|11.11111111 / 22
+ = 172.16.251.255/22
+Rest:
+Netzwerkname = 10101100.00010000.111111|00.00000000 / 22
+ = 172.16.252.0/22
+
+500 Hosts:
+9 bit addressraum, 23 bit Netzwerkadresse
+Netzwerkadresse = 10101100.00010000.1111110|0.00000000 / 23
+ = 172.16.252.0/23
+Erste Adresse = 10101100.00010000.1111110|0.00000001 / 23
+ = 172.16.252.1/23
+BC Adresse = 10101100.00010000.1111110|1.11111111 / 23
+ = 172.16.253.255/23
+Rest:
+Netzwerkname = 10101100.00010000.1111111|0.00000000 / 23
+ = 172.16.254.0/23
+
+
+R1
+Gi0/0	172.16.240.1/21 255.255.248.0
+Lo0		172.16.224.1/20 255.255.240.0
+S0/0/0
+S0/0/1
+
+R2
+Gi0/0	172.16.128.1/18 255.255.192.0
+Lo1		172.16.192.1/19 255.255.224.0
+S0/0/0
+S0/0/1
+
+R3
+Gi0/0	172.16.252.1/23 255.255.254.0
+Lo2		172.16.248.1/22 255.255.252.0
+S0/0/0
+S0/0/1
+
+
+4)
+Addressblock 2001:DB8:D112::/48
+
+a)
+IPv6 benötigt aufgrund seines grossen Addressbereichs u.A. keine Netzaddress-Übersetzung (NAT).
+Ausgehend von unserem 48-bit Addressblock bleiben 16 Bit für bis zu ca. 65500 Mögliche Subnetz-Addressen über.
+
+
+b)
+
+R1
+Gi0/0	2001:DB8:D112:4::/48
+Lo0		2001:DB8:D112:3::/48
+S0/0/0
+S0/0/1
+
+R2
+Gi0/0	2001:DB8:D112:1::/48
+Lo1		2001:DB8:D112:2::/48
+S0/0/0
+S0/0/1
+
+R3
+Gi0/0	2001:DB8:D112:6::/48
+Lo2		2001:DB8:D112:5::/48
+S0/0/0
+S0/0/1
+
+
+
+
+
+
+
+
+
+
+
+
+

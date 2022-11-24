@@ -2,17 +2,10 @@
 
 #include "SQLTokens.hpp"
 
-// #include <initializer_list>
-// // #include <string_view>
-// #include <cstdint>
-// #include <string>
-// #include <cctype> // tolower
-// #include <memory>
-
-
-
-
-
+#include <cstdint>
+#include <string>
+#include <memory>
+#include <vector>
 
 
 class SQLParser {

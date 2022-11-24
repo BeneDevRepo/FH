@@ -64,7 +64,7 @@ private:
 
 public:
 	inline SQLLiteral(const std::string& literal): literal(literal) {}
-    inline void setOutput(std::string& output) {}
+    inline void setOutput(std::string& output) {} // TODO: implement
 	inline virtual bool parse(SQLParseResult& result, const std::string& source, size_t& index) const {
 		for(size_t i = 0; i < literal.size(); i++) {
 			if(index + i >= source.size()) {
