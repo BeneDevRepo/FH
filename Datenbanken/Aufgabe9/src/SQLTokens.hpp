@@ -8,28 +8,6 @@
 #include <vector>
 
 
-class SQLParseResult {
-private:
-	bool success_;
-	size_t index_;
-	std::string error_;
-
-private:
-	inline SQLParseResult(const bool success): success_(success) { }
-	inline SQLParseResult(const std::string& error, const size_t index): success_(false), error_(error), index_(index) { }
-
-public:
-	inline SQLParseResult() { }
-	inline static SQLParseResult Success() { return { true }; }
-	inline static SQLParseResult Error(const std::string& msg, const size_t index) { return { msg, index }; }
-
-public:
-	inline bool success() const { return success_; }
-	inline const std::string& error() const { return error_; }
-	inline size_t errorIndex() const { return index_; }
-};
-
-
 
 struct Command {
     enum Type { SELECT, INSERT };
@@ -50,6 +28,42 @@ struct InsertCommand : public Command {
 
 
 
+class SQLParseResult {
+private:
+	bool success_;
+
+	// on success:
+	std::unique_ptr<Command> command_; // TODO: implement
+
+	// on error:
+	size_t index_;
+	std::string error_;
+	
+
+private:
+	inline SQLParseResult(const bool success): success_(success) { }
+	inline SQLParseResult(const std::string& error, const size_t index): success_(false), error_(error), index_(index) { }
+
+public:
+	inline SQLParseResult() { }
+	inline static SQLParseResult Success() { return { true }; }
+	inline static SQLParseResult Error(const std::string& msg, const size_t index) { return { msg, index }; }
+
+public:
+	inline bool success() const { return success_; }
+
+	// on success:
+	inline std::unique_ptr<Command>& command() { return command_; }
+
+	// on error:
+	inline const std::string& error() const { return error_; }
+	inline size_t errorIndex() const { return index_; }
+};
+
+
+
+
+
 class SQLToken {
 public:
 	virtual ~SQLToken(){}
@@ -64,7 +78,6 @@ private:
 
 public:
 	inline SQLLiteral(const std::string& literal): literal(literal) {}
-    inline void setOutput(std::string& output) {} // TODO: implement
 	inline virtual bool parse(SQLParseResult& result, const std::string& source, size_t& index) const {
 		for(size_t i = 0; i < literal.size(); i++) {
 			if(index + i >= source.size()) {
@@ -85,15 +98,22 @@ public:
 
 
 class SQLIdentifier : public SQLToken {
+	private:
+		std::string *output;
 public:
 	inline SQLIdentifier() {}
+    inline void setOutput(std::string& output) {
+		this->output = &output;
+	}
 	inline virtual bool parse(SQLParseResult& result, const std::string& source, size_t& index) const {
 		constexpr auto validIDChar =
 			[](const char c) -> bool {
 				return (c >= 'a' && c <= 'z') || c == '_';
 			};
-		
+
 		const size_t index_orig = index;
+
+		*output = ""; // clear output
 
 		for(;;) {
 			if(index >= source.size() || !validIDChar(tolower(source[index]))) {
@@ -104,7 +124,7 @@ public:
 				return true; // Identifier ended; success.
 			}
 
-			tolower(source[index++]); // TODO: use
+			*output += tolower(source[index++]); // write to output
 		}
 	}
 };
@@ -219,23 +239,36 @@ public:
 
 class SQLList : public SQLToken { // consumes following spaces
 private:
-	std::unique_ptr<SQLToken> token;
+	std::unique_ptr<SQLIdentifier> token;
 	SQLSpace optSpace;
     SQLLiteral comma;
 
+	std::vector<std::string>* output;
+
 public:
-	inline SQLList(SQLToken *const token):
+	inline SQLList(SQLIdentifier *const token):
 			token(token), optSpace(true), comma(",") {}
-	inline SQLList(std::unique_ptr<SQLToken> token):
+	inline SQLList(std::unique_ptr<SQLIdentifier> token):
 			token(std::move(token)), optSpace(true), comma(",") {}
+
+	inline void setOutput(std::vector<std::string>& output) {
+		this->output = &output;
+	}
 	inline virtual bool parse(SQLParseResult& result, const std::string& source, size_t& index) const {
 		const size_t index_orig = index;
 
+		output->clear(); // clear output
+
         // for(size_t num_elements = 0; ; num_elements++) {
         for(;;) {
-            if(!token->parse(result, source, index)) {
+			std::string item;
+			token->setOutput(item);
+
+            if(!token->parse(result, source, index)) { // try extracting identifier
                 return false;
             }
+
+			output->push_back(item); // write to output
 
             optSpace.parse(result, source, index); // optional space before comma
 

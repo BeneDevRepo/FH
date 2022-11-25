@@ -14,23 +14,29 @@ private:
 
 public:
 	inline SQLParser() {
-		std::unique_ptr SELECT = std::make_unique<SQLCommand>(
-				new SQLSpace(true),
-				new SQLLiteral("SELECT"),
-				new SQLSpace,
-				new SQLVariant(
-					new SQLLiteral("*"),
-					new SQLList(new SQLIdentifier)
-					// new SQLLiteral("Autor")
-				),
-				new SQLSpace(true),
-				new SQLLiteral("FROM"),
-				new SQLSpace,
-				new SQLLiteral("Buch"),
-				new SQLSpace(true),
-				new SQLLiteral(";")
-			);
-		commands.push_back(std::move(SELECT));
+		Command *select = new SelectCommand;
+		{
+			SQLList *columnList = new SQLList(new SQLIdentifier);
+			columnList->setOutput(((SelectCommand*)select)->columns);
+
+			std::unique_ptr SELECT = std::make_unique<SQLCommand>(
+					new SQLSpace(true),
+					new SQLLiteral("SELECT"),
+					new SQLSpace,
+					new SQLVariant(
+						new SQLLiteral("*"),
+						// new SQLList(new SQLIdentifier)
+						columnList
+					),
+					new SQLSpace(true),
+					new SQLLiteral("FROM"),
+					new SQLSpace,
+					new SQLLiteral("Buch"),
+					new SQLSpace(true),
+					new SQLLiteral(";")
+				);
+			commands.push_back(std::move(SELECT));
+		}
 
 		commands.push_back(
 			std::make_unique<SQLCommand>(
