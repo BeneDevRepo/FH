@@ -2,10 +2,36 @@
 
 #include "SQLTokens.hpp"
 
+#include <iostream>
 #include <cstdint>
 #include <string>
 #include <memory>
 #include <vector>
+
+
+std::ostream& operator<<(std::ostream& cout, const std::unique_ptr<Command>& command) {
+	if(command->name.size() > 0)
+		cout << command->name << ": ";
+
+	switch(command->type()) {
+		case Command::Type::NULL_:
+			cout << "<null>";
+			break;
+		case Command::Type::STRING:
+			cout << ((CommandString*)command.get())->str;
+			break;
+
+		case Command::Type::LIST:
+			std::cout << "[";
+			for(const std::unique_ptr<Command>& item : ((CommandList*)command.get())->list)
+				std::cout << item << ", ";
+			std::cout << "]";
+			break;
+	}
+
+	return cout;
+}
+
 
 
 class SQLParser {
@@ -14,32 +40,29 @@ private:
 
 public:
 	inline SQLParser() {
-		Command *select = new SelectCommand;
-		{
-			SQLList *columnList = new SQLList(new SQLIdentifier);
-			columnList->setOutput(((SelectCommand*)select)->columns);
-
-			std::unique_ptr SELECT = std::make_unique<SQLCommand>(
-					new SQLSpace(true),
-					new SQLLiteral("SELECT"),
-					new SQLSpace,
-					new SQLVariant(
-						new SQLLiteral("*"),
-						// new SQLList(new SQLIdentifier)
-						columnList
-					),
-					new SQLSpace(true),
-					new SQLLiteral("FROM"),
-					new SQLSpace,
-					new SQLLiteral("Buch"),
-					new SQLSpace(true),
-					new SQLLiteral(";")
-				);
-			commands.push_back(std::move(SELECT));
-		}
+		commands.push_back(
+			std::make_unique<SQLCommand>(
+				std::string("Select"), // Command Name
+				new SQLSpace(true),
+				new SQLLiteral("SELECT"),
+				new SQLSpace,
+				new SQLVariant(
+					std::string("Columns"), // Name of column group
+					new SQLLiteral("*"),
+					new SQLList(new SQLIdentifier)
+				),
+				new SQLSpace(true),
+				new SQLLiteral("FROM"),
+				new SQLSpace,
+				new SQLLiteral("Buch"),
+				new SQLSpace(true),
+				new SQLLiteral(";")
+			)
+		);
 
 		commands.push_back(
 			std::make_unique<SQLCommand>(
+				std::string("Insert"), // Command Name
 				new SQLSpace(true),
 				new SQLLiteral("INSERT"),
 				new SQLSpace,
@@ -48,19 +71,23 @@ public:
 				new SQLLiteral("Buch"),
 
 				new SQLVariant(
+					std::string("Columns"), // Name of target column Group
 					new SQLCommand(
 						new SQLSpace(true),
 						new SQLLiteral("("),
-							new SQLSpace(true),
+							new SQLList(new SQLIdentifier),
+							// new SQLSpace(true),
 						new SQLLiteral(")"),
 						new SQLSpace(true)
 					),
 					new SQLSpace
 				),
 
-				new SQLLiteral("VALUES"), new SQLSpace(true),
+				new SQLLiteral("VALUES"),
+				new SQLSpace(true),
 				new SQLLiteral("("),
-					new SQLSpace(true),
+					new SQLList(new SQLIdentifier),
+					// new SQLSpace(true),
 				new SQLLiteral(")"),
 				new SQLSpace(true),
 				new SQLLiteral(";")
@@ -73,7 +100,11 @@ public:
 		// for(; start < source.size() && source[start] == ' '; start++); // skip leading spaces
 
 		for(const std::unique_ptr<SQLToken>& command : commands) {
-			if(command->parse(result, source, start)) {
+			// if(command->parse(result, source, start)) {
+			auto res = command->parse(source, start);
+			if(res.success()) {
+				// std::cout << "Command: " << result.command() << "\n";
+				std::cout << "Command: " << res.command() << "\n";
 				return true;
 			}
 		}
