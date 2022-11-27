@@ -22,10 +22,16 @@ std::ostream& operator<<(std::ostream& cout, const std::unique_ptr<Command>& com
 			break;
 
 		case Command::Type::LIST:
-			std::cout << "[";
-			for(const std::unique_ptr<Command>& item : ((CommandList*)command.get())->list)
-				std::cout << item << ", ";
-			std::cout << "]";
+			{
+				const auto& list = ((CommandList*)command.get())->list;
+				cout << "[";
+				for(size_t i = 0; i < list.size(); i++) {
+					std::cout << list[i];
+					if(i < list.size() - 1)
+						cout << ", ";
+				}
+				cout << "]";
+			}
 			break;
 	}
 
@@ -36,79 +42,167 @@ std::ostream& operator<<(std::ostream& cout, const std::unique_ptr<Command>& com
 
 class SQLParser {
 private:
-	std::vector<std::unique_ptr<SQLToken>> commands;
+	std::unique_ptr<SQLToken> commands;
 
 public:
 	inline SQLParser() {
-		commands.push_back(
-			std::make_unique<SQLCommand>(
-				std::string("Select"), // Command Name
-				new SQLSpace(true),
-				new SQLLiteral("SELECT"),
-				new SQLSpace,
-				new SQLVariant(
-					std::string("Columns"), // Name of column group
-					new SQLLiteral("*"),
-					new SQLList(new SQLIdentifier)
-				),
-				new SQLSpace(true),
-				new SQLLiteral("FROM"),
-				new SQLSpace,
-				new SQLLiteral("Buch"),
-				new SQLSpace(true),
-				new SQLLiteral(";")
-			)
+		SQLToken* exit = new SQLCommand(
+			std::string("__exit__"), // Command Name
+			new SQLSpace(true),
+			new SQLLiteral("EXIT"),
+			new SQLSpace(true),
+			new SQLLiteral(";")
 		);
 
-		commands.push_back(
-			std::make_unique<SQLCommand>(
-				std::string("Insert"), // Command Name
-				new SQLSpace(true),
-				new SQLLiteral("INSERT"),
-				new SQLSpace,
-				new SQLLiteral("INTO"),
-				new SQLSpace,
-				new SQLLiteral("Buch"),
+		SQLToken* help = new SQLCommand(
+			std::string("__help__"), // Command Name
+			new SQLSpace(true),
+			new SQLLiteral("HELP"),
+			new SQLSpace(true),
+			new SQLLiteral(";")
+		);
 
-				new SQLVariant(
-					std::string("Columns"), // Name of target column Group
-					new SQLCommand(
-						new SQLSpace(true),
-						new SQLLiteral("("),
-							new SQLList(new SQLIdentifier),
-							// new SQLSpace(true),
-						new SQLLiteral(")"),
-						new SQLSpace(true)
-					),
+		SQLToken* create_table = new SQLCommand(
+			std::string("__create_table__"), // Command Name
+			new SQLSpace(true),
+			new SQLLiteral("CREATE"),
+			new SQLSpace,
+			new SQLLiteral("TABLE"),
+			new SQLSpace,
+			new SQLIdentifier("_table_"), // table name
+			new SQLSpace(true),
+			new SQLLiteral(";")
+		);
+
+		SQLToken* drop_table = new SQLCommand(
+			std::string("__drop_table__"), // Command Name
+			new SQLSpace(true),
+			new SQLLiteral("DROP"),
+			new SQLSpace,
+			new SQLLiteral("TABLE"),
+			new SQLSpace,
+			new SQLIdentifier("_table_"), // table name
+			new SQLSpace(true),
+			new SQLLiteral(";")
+		);
+
+		SQLToken* select = new SQLCommand(
+			std::string("__select__"), // Command Name
+			new SQLSpace(true),
+			new SQLLiteral("SELECT"),
+			new SQLSpace,
+
+			// columns to select:
+			new SQLVariant(
+				std::string("_columns_"),
+				new SQLLiteral("*"),
+				new SQLList(new SQLIdentifier)
+			),
+
+			new SQLSpace(true),
+			new SQLLiteral("FROM"),
+			new SQLSpace,
+
+			// source table(s):
+			new SQLList(
+				std::string("_sources_"),
+				new SQLIdentifier
+			),
+
+			new SQLSpace(true),
+			new SQLLiteral(";")
+		);
+
+		SQLToken* insert = new SQLCommand(
+			std::string("__insert__"), // Command Name
+			new SQLSpace(true),
+			new SQLLiteral("INSERT"),
+			new SQLSpace,
+			new SQLLiteral("INTO"),
+			new SQLSpace,
+			new SQLIdentifier("_table_"), // target table
+			new SQLSpace(true),
+
+			// optional target columns:
+			new SQLOptional(
+				new SQLParanthesis(
+					new SQLList(
+						std::string("_columns_"),
+						new SQLIdentifier
+					)
+				)
+			),
+
+			new SQLSpace(true),
+			new SQLLiteral("VALUES"),
+			new SQLSpace(true),
+
+			// list of values to insert:
+			new SQLParanthesis(
+				new SQLList(
+					std::string("_values_"),
+					new SQLIdentifier
+				)
+			),
+
+			new SQLSpace(true),
+			new SQLLiteral(";")
+		);
+
+		SQLToken* create_index = new SQLCommand(
+			std::string("__create_index__"), // Command Name
+			new SQLSpace(true),
+			new SQLLiteral("CREATE"),
+			new SQLSpace,
+			new SQLOptional(
+				new SQLCommand(
+					new SQLLiteral("UNIQUE"),
 					new SQLSpace
-				),
+				)
+			),
+			new SQLLiteral("INDEX"),
+			new SQLSpace,
+			new SQLIdentifier("_index_name_"), // index name
+			new SQLSpace,
+			new SQLLiteral("ON"),
+			new SQLSpace,
+			new SQLIdentifier("_table_"), // target table
+			new SQLSpace(true),
 
-				new SQLLiteral("VALUES"),
-				new SQLSpace(true),
-				new SQLLiteral("("),
-					new SQLList(new SQLIdentifier),
-					// new SQLSpace(true),
-				new SQLLiteral(")"),
-				new SQLSpace(true),
-				new SQLLiteral(";")
-			)
+			new SQLParanthesis(
+				new SQLList(
+					std::string("_columns_"), // target columns
+					new SQLIdentifier()
+				)
+			),
+
+			new SQLSpace(true),
+			new SQLLiteral(";")
 		);
-		// commands.push_back(std::make_unique<SQLLiteral>("INSERT"));
+
+		commands = std::make_unique<SQLVariant>(
+			exit,
+			help,
+			create_table,
+			drop_table,
+			select,
+			insert,
+			create_index
+		);
 	}
 
-	inline bool parse(SQLParseResult& result, const std::string& source, size_t start) {
+
+	inline SQLParseResult parse(const std::string& source, size_t start) {
 		// for(; start < source.size() && source[start] == ' '; start++); // skip leading spaces
 
-		for(const std::unique_ptr<SQLToken>& command : commands) {
-			// if(command->parse(result, source, start)) {
-			auto res = command->parse(source, start);
-			if(res.success()) {
-				// std::cout << "Command: " << result.command() << "\n";
-				std::cout << "Command: " << res.command() << "\n";
-				return true;
-			}
+		auto res = commands->parse(source, start);
+		if(res.success()) {
+			// std::cout << "Command: " << result.command() << "\n";
+			std::cout << "Command: " << res.command() << "\n";
+			return res;
 		}
 
-		return false;
+		// return res;
+		return SQLParseResult::Error("", 0);
 	}
 };

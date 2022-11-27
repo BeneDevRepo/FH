@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <iostream>
 #include <string>
 
@@ -18,4 +19,9 @@ inline std::string readLine() {
 
         line += (char)c;
     }
+}
+
+inline std::string toLowerCase(std::string s) {
+	std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+	return s;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <initializer_list>
+#include <type_traits>
 #include <cstdint>
 #include <cctype> // tolower
 #include <string>
@@ -9,8 +10,8 @@
 
 
 struct Command {
-    enum Type { NULL_=0, SELECT, INSERT, STRING, LIST };
-    virtual inline Type type() const = 0;
+    enum Type { NULL_=0, STRING, LIST };
+    virtual Type type() const = 0;
 	std::string name;
 };
 
@@ -36,22 +37,6 @@ struct CommandList : public Command {
 	std::vector<std::unique_ptr<Command>> list;
 };
 
-// struct SelectCommand : public Command {
-// 	inline SelectCommand() = default;
-// 	inline SelectCommand(const std::string& name) { this->name = name; }
-//     virtual inline Type type() const { return SELECT; }
-//     CommandString table;
-//     std::vector<CommandString> columns;
-// };
-
-// struct InsertCommand : public Command {
-// 	inline InsertCommand() = default;
-// 	inline InsertCommand(const std::string& name) { this->name = name; }
-//     virtual inline Type type() const { return INSERT; }
-//     CommandString table;
-//     std::vector<CommandString> columns;
-// };
-
 
 
 class SQLParseResult {
@@ -59,7 +44,7 @@ private:
 	bool success_;
 
 	// on success:
-	std::unique_ptr<Command> command_; // TODO: implement
+	std::unique_ptr<Command> command_;
 
 	// on error:
 	size_t index_;
@@ -89,14 +74,12 @@ public:
 
 
 
-
-
 class SQLToken {
 protected:
 	std::string name;
+
 public:
 	virtual ~SQLToken(){}
-	// virtual bool parse(SQLParseResult& result, const std::string& source, size_t& index) const = 0; // on error, index is left unchanged
 	virtual SQLParseResult parse(const std::string& source, size_t& index) const = 0; // on error, index is left unchanged
 	inline SQLToken* setName(const std::string& name) { this->name = name; return this; }
 };
@@ -110,25 +93,19 @@ private:
 public:
 	inline SQLLiteral(const std::string& literal): literal(literal) {}
 	inline SQLLiteral(const std::string& literal, const std::string& name): literal(literal) { this->name = name; }
+
 	inline virtual SQLParseResult parse(const std::string& source, size_t& index) const {
-	// inline virtual bool parse(SQLParseResult& result, const std::string& source, size_t& index) const {
 		for(size_t i = 0; i < literal.size(); i++) {
 			if(index + i >= source.size()) {
-				// return false;
 				return SQLParseResult::Error("Could not parse Literal: input ended prematurely", index + i);
 			}
 
 			if(tolower(literal[i]) != tolower(source[index + i])) {
-				// return false;
 				return SQLParseResult::Error("Could not parse Literal: input mismatch", index + i);
 			}
 		}
 
 		index += literal.size();
-
-		// result.command() = std::make_unique<CommandNull>();
-
-		// return true;
 
 		// if Token is named:
 		if(name.size() > 0) { 
@@ -144,15 +121,10 @@ public:
 
 
 class SQLIdentifier : public SQLToken {
-	private:
-		// std::string *output;
 public:
 	inline SQLIdentifier() {}
 	inline SQLIdentifier(const std::string& name) { this->name = name; }
-    // inline void setOutput(std::string& output) {
-	// 	this->output = &output;
-	// }
-	// inline virtual bool parse(SQLParseResult& result, const std::string& source, size_t& index) const {
+
 	inline virtual SQLParseResult parse(const std::string& source, size_t& index) const {
 		constexpr auto validIDChar =
 			[](const char c) -> bool {
@@ -161,19 +133,12 @@ public:
 
 		const size_t index_orig = index;
 
-		// *output = ""; // clear output
 		std::unique_ptr<CommandString> output(new CommandString);
-	
 
 		for(;;) {
 			if(index >= source.size() || !validIDChar(tolower(source[index]))) {
-				if(index == index_orig) {
-					// return false; // an identifier hat to consist of at least 1 character
+				if(index == index_orig)
 					return SQLParseResult::Error("Identifier: No valid identifier was found", index); // an identifier hat to consist of at least 1 character
-				}
-
-				// result.command() = std::move(output);
-				// return true; // Identifier ended; success.
 
 				// if identifier is named:
 				if(name.size() > 0)
@@ -182,7 +147,6 @@ public:
 				return SQLParseResult::Success(std::move(output));
 			}
 
-			// *output += tolower(source[index++]); // write to output
 			output->str += tolower(source[index++]); // write to output
 		}
 	}
@@ -193,10 +157,11 @@ public:
 class SQLSpace : public SQLToken {
 private:
 	bool optional; // if optional, 0..n spaces can be present. otherwise, there has to be at least one space
+
 public:
 	inline SQLSpace(const bool optional = false): optional(optional) {}
 	// inline static SQLSpace Optional() { return SQLSpace(true); }
-	// inline virtual bool parse(SQLParseResult& result, const std::string& source, size_t& index) const {
+
 	inline virtual SQLParseResult parse(const std::string& source, size_t& index) const {
 		constexpr auto isSpace = 
 			[](const char c) -> bool {
@@ -205,7 +170,6 @@ public:
 
 		if(!optional) {
 			if(index >= source.size() || !isSpace(source[index]))
-				// return false;
 				return SQLParseResult::Error("Space: space not found", index);
 
 			index++;
@@ -214,10 +178,6 @@ public:
 		while(index < source.size() && isSpace(source[index])) {
 			index++;
 		}
-
-		// result.command() = std::make_unique<CommandNull>();
-
-		// return true;
 
 		return SQLParseResult::Success();
 	}
@@ -246,19 +206,16 @@ public:
 			parts(std::move(parts)) {}
 	inline SQLCommand(std::vector<std::unique_ptr<SQLToken>> parts, const std::string& name):
 			parts(std::move(parts)) { this->name = name; }
-	// inline virtual bool parse(SQLParseResult& result, const std::string& source, size_t& index) const {
+
 	inline virtual SQLParseResult parse(const std::string& source, size_t& index) const {
 		const size_t index_orig = index;
 
 		std::unique_ptr<CommandList> output = std::make_unique<CommandList>();
 		
 		for(auto part = parts.begin(); part != parts.end(); ++part) {
-			// SQLParseResult subResult;
-			// if(!(*part)->parse(subResult, source, index)) {
 			auto subResult = (*part)->parse(source, index);
 			if(!subResult.success()) {
 				index = index_orig;
-				// return false;
 				return subResult;
 			}
 
@@ -266,9 +223,10 @@ public:
 				output->list.emplace_back(std::move(subResult.command()));
 		}
 
-		// result.command() = std::move(output);
-
-		// return true;
+		// empty command decays to null-value IF they are not named:
+		if(output->list.size() == 0)
+			if(name.size() == 0)
+				return SQLParseResult::Success();
 
 		output->name = name;
 		return SQLParseResult::Success(std::move(output));
@@ -294,14 +252,12 @@ public:
 			}()
 		, ...);
 	}
-	inline SQLVariant(std::vector<std::unique_ptr<SQLToken>> parts):
-			parts(std::move(parts)) {}
-	// inline virtual bool parse(SQLParseResult& result, const std::string& source, size_t& index) const {
+	// inline SQLVariant(std::vector<std::unique_ptr<SQLToken>> parts):
+	// 		parts(std::move(parts)) {}
 	inline virtual SQLParseResult parse(const std::string& source, size_t& index) const {
-		// const size_t index_orig = index;
 		for(auto part = parts.begin(); part != parts.end(); ++part) {
-			// if((*part)->parse(result, source, index)) {
 			auto res = (*part)->parse(source, index);
+
 			if(res.success()) {
 				// if variant is named:
 				if(name.size() > 0)
@@ -326,14 +282,12 @@ public:
 			token(token) {}
 	inline SQLOptional(std::unique_ptr<SQLToken> token):
 			token(std::move(token)) {}
-	// inline virtual bool parse(SQLParseResult& result, const std::string& source, size_t& index) const {
+
 	inline virtual SQLParseResult parse(const std::string& source, size_t& index) const {
 		const size_t index_orig = index;
 
-		// if(token->parse(result, source, index)) {
 		auto res = token->parse(source, index);
 		if(res.success()) {
-			// return true;
 			return res;
 		}
 
@@ -351,32 +305,23 @@ private:
 	SQLSpace optSpace;
     SQLLiteral comma;
 
-	// std::vector<std::string>* output;
-
 public:
-	inline SQLList(SQLIdentifier *const token):
-			token(token), optSpace(true), comma(",") {}
-	inline SQLList(SQLIdentifier *const token, const std::string& name):
+	inline SQLList(SQLIdentifier *const token, const std::string& name = ""):
 			token(token), optSpace(true), comma(",") { this->name = name; }
-	inline SQLList(std::unique_ptr<SQLIdentifier> token):
-			token(std::move(token)), optSpace(true), comma(",") {}
-	inline SQLList(std::unique_ptr<SQLIdentifier> token, const std::string& name):
+	inline SQLList(std::unique_ptr<SQLIdentifier> token, const std::string& name = ""):
 			token(std::move(token)), optSpace(true), comma(",") { this->name = name; }
 
-	// inline void setOutput(std::vector<std::string>& output) {
-	// 	// this->output = &output;
-	// }
-	// inline virtual bool parse(SQLParseResult& result, const std::string& source, size_t& index) const {
+	inline SQLList(const std::string& name, SQLIdentifier *const token):
+			SQLList(token, name) { }
+	inline SQLList(const std::string& name, std::unique_ptr<SQLIdentifier> token):
+			SQLList(std::move(token), name) { }
+
 	inline virtual SQLParseResult parse(const std::string& source, size_t& index) const {
 		const size_t index_orig = index;
 
 		std::unique_ptr<CommandList> output(new CommandList);
 
-        // for(size_t num_elements = 0; ; num_elements++) {
         for(;;) {
-			// SQLParseResult subResult;
-
-            // if(!token->parse(subResult, source, index)) { // try extracting identifier
             auto res = token->parse(source, index); // try extracting identifier
 			if(!res.success()) {
                 return res;
@@ -385,12 +330,9 @@ public:
 			if(res.command()->type() != Command::NULL_)
 				output->list.push_back(std::move(res.command()));
 
-            // optSpace.parse(subResult, source, index); // optional space before comma
             optSpace.parse(source, index); // optional space before comma
 
             if(!(comma.parse(source, index).success())) { // comma
-				// result.command() = std::move(output);
-                // return true;
 
 				// if list is named:
 				if(name.size() > 0)
@@ -399,8 +341,81 @@ public:
 				return SQLParseResult::Success(std::move(output));
 			}
 
-            // optSpace.parse(subResult, source, index); // optional space after comma
             optSpace.parse(source, index); // optional space after comma
         }
+	}
+};
+
+
+
+class SQLParanthesis : public SQLToken { // consumes following spaces
+private:
+	std::unique_ptr<SQLToken> content;
+	std::unique_ptr<SQLLiteral> openP; // opening paranthesis
+	std::unique_ptr<SQLLiteral> closeP; // clsoing paranthesis
+	std::unique_ptr<SQLSpace> optSpace; // optional space
+
+public:
+	inline SQLParanthesis(SQLToken *const content, const std::string& name = ""):
+			content(content),
+			openP(std::make_unique<SQLLiteral>("(")),
+			closeP(std::make_unique<SQLLiteral>(")")),
+			optSpace(std::make_unique<SQLSpace>(true))
+			{ this->name = name; }
+	inline SQLParanthesis(std::unique_ptr<SQLToken> content, const std::string& name = ""):
+			content(std::move(content)),
+			openP(std::make_unique<SQLLiteral>("(")),
+			closeP(std::make_unique<SQLLiteral>(")")),
+			optSpace(std::make_unique<SQLSpace>(true))
+			{ this->name = name; }
+
+	inline SQLParanthesis(const std::string& name, SQLIdentifier *const token):
+			SQLParanthesis(token, name) { }
+	inline SQLParanthesis(const std::string& name, std::unique_ptr<SQLIdentifier> token):
+			SQLParanthesis(std::move(token), name) { }
+
+	inline virtual SQLParseResult parse(const std::string& source, size_t& index) const {
+		const size_t index_orig = index;
+
+		SQLParseResult res;
+
+		res = openP->parse(source, index); // parse opening paranthesis
+		if(!res.success()) {
+			index = index_orig;
+			return res;
+		}
+
+		res = optSpace->parse(source, index); // parse optional space between opening paranthesis and list
+		if(!res.success()) {
+			index = index_orig;
+			return res;
+		}
+
+		res = content->parse(source, index); // try parsing content
+		if(!res.success()) {
+			index = index_orig;
+			return res;
+		}
+
+		std::unique_ptr<Command> output = std::move(res.command()); // extract content
+
+
+		res = optSpace->parse(source, index); // parse optional space between list and closing paranthesis
+		if(!res.success()) {
+			index = index_orig;
+			return res;
+		}
+
+		res = closeP->parse(source, index); // parse closing paranthesis
+		if(!res.success()) {
+			index = index_orig;
+			return res;
+		}
+
+		// name output:
+		if(name.size() > 0)
+			output->name = name;
+
+		return SQLParseResult::Success(std::move(output));
 	}
 };

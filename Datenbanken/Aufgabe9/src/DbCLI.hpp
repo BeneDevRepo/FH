@@ -16,7 +16,6 @@ private:
 
 public:
 	inline DbCLI(): db() {}
-	// ~DbCLI();
 
 	void run();
 

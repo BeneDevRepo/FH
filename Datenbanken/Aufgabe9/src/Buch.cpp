@@ -1,6 +1,8 @@
 #include "Buch.hpp"
 
-#include <string_view>
+#include "util.hpp"
+
+#include <type_traits>
 #include <cstring>
 
 
@@ -44,3 +46,38 @@ std::ostream& operator<<(std::ostream& cout, const Buch& b) {
 		<< ", ISBN: " << strv(b.ISBN, 15);
 	return cout;
 }
+
+#define COL_DESC(COLUMN) \
+	{ \
+		toLowerCase(#COLUMN), \
+		Column { \
+			#COLUMN, \
+			std::is_same_v<int, decltype(COLUMN)> \
+				? Column::INTEGER \
+				: Column::STRING, \
+			offsetof(Buch, COLUMN), \
+			sizeof(COLUMN) \
+		} \
+	}
+
+const std::unordered_map<std::string, Buch::Column> Buch::columns {
+	COL_DESC(Autor), // char Autor[21];
+
+	COL_DESC(Titel), // char Titel[41];
+	COL_DESC(Verlagsname), // char Verlagsname[21];
+	COL_DESC(Erscheinungsjahr), // int Erscheinungsjahr;
+	COL_DESC(Erscheinungsort), // char Erscheinungsort[41];
+	COL_DESC(ISBN) // char ISBN[15];
+};
+
+// const std::vector<Buch::Column> Buch::columns {
+// 	COL_DESC(Autor), // char Autor[21];
+
+// 	COL_DESC(Titel), // char Titel[41];
+// 	COL_DESC(Verlagsname), // char Verlagsname[21];
+// 	COL_DESC(Erscheinungsjahr), // int Erscheinungsjahr;
+// 	COL_DESC(Erscheinungsort), // char Erscheinungsort[41];
+// 	COL_DESC(ISBN) // char ISBN[15];
+// };
+
+#undef STR_COL
