@@ -265,7 +265,7 @@ public:
 	inline virtual SQLParseResult parse(const std::string& source, size_t& index) const {
 		constexpr auto isSpace = 
 			[](const char c) -> bool {
-				return c == ' ' || c == '\t';
+				return c == ' ' || c == '\t' || c == '\r' || c == '\n';
 			};
 
 		if(!optional) {

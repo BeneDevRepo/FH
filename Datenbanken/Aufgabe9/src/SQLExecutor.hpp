@@ -304,7 +304,31 @@ static inline void executeInsert(Database& db, const CommandMap& command) {
 }
 
 static inline void executeCreateIndex(Database& db, const CommandMap& command) {
-	db.createIndex("Autor");
+	const std::unordered_map<std::string, std::unique_ptr<Command>>& map = command.map; // extract hashmap
+
+	// validate that column list exists:
+	if(map.find("_columns_") == map.end())
+		throw std::runtime_error("Error: Create Index: columns not found");
+	
+	const Command& columns = *map.at("_columns_");
+
+	if(columns.type() != Command::LIST)
+		throw std::runtime_error("Error: Create Index: column list is not a list");
+	
+	const std::vector<std::unique_ptr<Command>>& columnList = ((CommandList&)columns).list;
+
+	if(columnList.size() == 0)
+		throw std::runtime_error("Error creating index: no column specified");
+	
+	const Command& column = *columnList[0];
+
+	if(column.type() != Command::STRING)
+		throw std::runtime_error("Error: Create Index: column is not a string");
+	
+	const std::string& columnString = ((CommandString&)column).str;
+
+
+	db.createIndex(columnString);
 }
 
 };

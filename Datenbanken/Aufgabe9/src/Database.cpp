@@ -120,6 +120,9 @@ const Buch& Database::getRow(const size_t position) const {
 void Database::createIndex(std::string column) {
 	column = toLowerCase(column);
 
+	if(indices.find(column) != indices.end())
+		throw std::runtime_error("Could not create index: index already present");
+
 	indices.insert({column, Index(column)});
 
 	for(size_t i = 0; i < buchDB.size(); i++)

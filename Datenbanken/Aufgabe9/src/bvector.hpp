@@ -103,7 +103,9 @@ public:
 
 			// swap buffers:
 			T *newContent = new T[newCapacity];
-			memcpy(newContent, content, std::min<size_t>(count, newSize) * sizeof(T));
+			for(size_t i = 0; i < std::min<size_t>(count, newSize); i++)
+				newContent[i] = std::move(content[i]);
+			// memcpy(newContent, content, std::min<size_t>(count, newSize) * sizeof(T));
 			delete[] content;
 			content = newContent;
 			capacity = newCapacity;
