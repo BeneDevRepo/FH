@@ -1,6 +1,9 @@
 #pragma once
 
+#include "util.hpp"
+
 #include <initializer_list>
+#include <unordered_map>
 #include <type_traits>
 #include <cstdint>
 #include <cctype> // tolower
@@ -10,7 +13,7 @@
 
 
 struct Command {
-    enum Type { NULL_=0, STRING, LIST };
+    enum Type { NULL_=0, STRING, INTEGER, LIST, MAP };
     virtual Type type() const = 0;
 	std::string name;
 };
@@ -30,11 +33,27 @@ struct CommandString : public Command {
 	std::string str;
 };
 
+struct CommandInt : public Command {
+	inline CommandInt() = default;
+	inline CommandInt(const std::string& name) { this->name = name; }
+	// inline CommandString(const std::string& str) { this->str = str; }
+	// inline CommandString(const std::string& str, const std::string& name) { this->str = str; this->name = name; }
+	virtual inline Type type() const { return INTEGER; }
+	int value;
+};
+
 struct CommandList : public Command {
 	inline CommandList() = default;
 	inline CommandList(const std::string& name) { this->name = name; }
 	virtual inline Type type() const { return LIST; }
 	std::vector<std::unique_ptr<Command>> list;
+};
+
+struct CommandMap : public Command {
+	inline CommandMap() = default;
+	inline CommandMap(const std::string& name) { this->name = name; }
+	virtual inline Type type() const { return MAP; }
+	std::unordered_map<std::string, std::unique_ptr<Command>> map;
 };
 
 
@@ -91,8 +110,8 @@ private:
 	std::string literal;
 
 public:
-	inline SQLLiteral(const std::string& literal): literal(literal) {}
-	inline SQLLiteral(const std::string& literal, const std::string& name): literal(literal) { this->name = name; }
+	inline SQLLiteral(const std::string& literal): literal(toLowerCase(literal)) {}
+	inline SQLLiteral(const std::string& literal, const std::string& name): literal(toLowerCase(literal)) { this->name = name; }
 
 	inline virtual SQLParseResult parse(const std::string& source, size_t& index) const {
 		for(size_t i = 0; i < literal.size(); i++) {
@@ -100,7 +119,7 @@ public:
 				return SQLParseResult::Error("Could not parse Literal: input ended prematurely", index + i);
 			}
 
-			if(tolower(literal[i]) != tolower(source[index + i])) {
+			if(literal[i] != tolower(source[index + i])) {
 				return SQLParseResult::Error("Could not parse Literal: input mismatch", index + i);
 			}
 		}
@@ -148,6 +167,87 @@ public:
 			}
 
 			output->str += tolower(source[index++]); // write to output
+		}
+	}
+};
+
+
+
+class SQLString : public SQLToken {
+public:
+	inline SQLString() {}
+	inline SQLString(const std::string& name) { this->name = name; }
+
+	inline virtual SQLParseResult parse(const std::string& source, size_t& index) const {
+		const size_t index_orig = index;
+
+		// test if string starts with <'>
+		if(source[index] != '\'')
+			return SQLParseResult::Error("Could not parse String: missing leading <\'>", index);
+		index++; // consume <'>
+
+		std::unique_ptr<CommandString> output(new CommandString);
+
+		for(;;) {
+			const char c = source[index++];
+
+			if(index >= source.size()) {
+				index = index_orig;
+				return SQLParseResult::Error("Could not parse String: command ended before <\'> was found", index); // an identifier hat to consist of at least 1 character
+			}
+
+			if(c == '\'') {
+				// if string is named:
+				if(name.size() > 0)
+					output->name = name; // copy string name
+
+				return SQLParseResult::Success(std::move(output));
+			}
+
+			output->str += c; // write to output
+		}
+	}
+};
+
+
+
+class SQLInteger : public SQLToken {
+public:
+	inline SQLInteger() {}
+	inline SQLInteger(const std::string& name) { this->name = name; }
+
+	inline virtual SQLParseResult parse(const std::string& source, size_t& index) const {
+		constexpr auto validIDChar =
+			[](const char c) -> bool {
+				return c >= '0' && c <= '9';
+			};
+
+		const size_t index_orig = index;
+
+		if(index >= source.size() // end of input
+			|| (!validIDChar(source[index]) && source[index] != '-') // no digit or '-'
+			|| (source[index] == '-' && (index + 1 >= source.size()))) // only '-' but not a single digit
+				return SQLParseResult::Error("Integer: No number was found", index); // an identifier hat to consist of at least 1 character
+
+		bool negative = source[index] == '-';
+		if(negative) index++; // consume '-'
+
+		std::unique_ptr<CommandInt> output(new CommandInt);
+
+		for(;;) {
+			if(index >= source.size() || !validIDChar(source[index])) {
+				if(index == index_orig || (negative && index == index_orig + 1))
+					return SQLParseResult::Error("Integer: No starting digit was found was found", index); // an identifier hat to consist of at least 1 character
+
+				// if identifier is named:
+				if(name.size() > 0)
+					output->name = name; // replace name with variant name
+
+				return SQLParseResult::Success(std::move(output));
+			}
+
+			output->value *= 10;
+			output->value += source[index++] - '0'; // write to output
 		}
 	}
 };
@@ -202,16 +302,16 @@ public:
 			}()
 		, ...);
 	}
-	inline SQLCommand(std::vector<std::unique_ptr<SQLToken>> parts):
-			parts(std::move(parts)) {}
-	inline SQLCommand(std::vector<std::unique_ptr<SQLToken>> parts, const std::string& name):
-			parts(std::move(parts)) { this->name = name; }
+	// inline SQLCommand(std::vector<std::unique_ptr<SQLToken>> parts):
+	// 		parts(std::move(parts)) {}
+	// inline SQLCommand(std::vector<std::unique_ptr<SQLToken>> parts, const std::string& name):
+	// 		parts(std::move(parts)) { this->name = name; }
 
 	inline virtual SQLParseResult parse(const std::string& source, size_t& index) const {
 		const size_t index_orig = index;
 
-		std::unique_ptr<CommandList> output = std::make_unique<CommandList>();
-		
+		std::unique_ptr<CommandMap> output = std::make_unique<CommandMap>();
+
 		for(auto part = parts.begin(); part != parts.end(); ++part) {
 			auto subResult = (*part)->parse(source, index);
 			if(!subResult.success()) {
@@ -220,11 +320,15 @@ public:
 			}
 
 			if(subResult.command()->type() != Command::NULL_)
-				output->list.emplace_back(std::move(subResult.command()));
+				// output->map.emplace_back(std::move(subResult.command()));
+				output->map.insert({
+					subResult.command()->name,
+					std::move(subResult.command())
+				});
 		}
 
 		// empty command decays to null-value IF they are not named:
-		if(output->list.size() == 0)
+		if(output->map.empty())
 			if(name.size() == 0)
 				return SQLParseResult::Success();
 
@@ -278,16 +382,23 @@ private:
 	std::unique_ptr<SQLToken> token;
 
 public:
-	inline SQLOptional(SQLToken *const token):
-			token(token) {}
-	inline SQLOptional(std::unique_ptr<SQLToken> token):
-			token(std::move(token)) {}
+	inline SQLOptional(SQLToken *const token, const std::string& name = ""):
+			token(token) { this->name = name; }
+	inline SQLOptional(std::unique_ptr<SQLToken> token, const std::string& name = ""):
+			token(std::move(token)) { this->name = name; }
+	inline SQLOptional(const std::string& name, SQLToken *const token):
+			SQLOptional(token, name) { }
+	inline SQLOptional(const std::string& name, std::unique_ptr<SQLToken> token):
+			SQLOptional(std::move(token), name) { }
 
 	inline virtual SQLParseResult parse(const std::string& source, size_t& index) const {
 		const size_t index_orig = index;
 
 		auto res = token->parse(source, index);
 		if(res.success()) {
+			// use optional name if present:
+			if(name.size() > 0)
+				res.command()->name = name;
 			return res;
 		}
 
@@ -301,19 +412,19 @@ public:
 
 class SQLList : public SQLToken { // consumes following spaces
 private:
-	std::unique_ptr<SQLIdentifier> token;
+	std::unique_ptr<SQLToken> token;
 	SQLSpace optSpace;
     SQLLiteral comma;
 
 public:
-	inline SQLList(SQLIdentifier *const token, const std::string& name = ""):
+	inline SQLList(SQLToken *const token, const std::string& name = ""):
 			token(token), optSpace(true), comma(",") { this->name = name; }
-	inline SQLList(std::unique_ptr<SQLIdentifier> token, const std::string& name = ""):
+	inline SQLList(std::unique_ptr<SQLToken> token, const std::string& name = ""):
 			token(std::move(token)), optSpace(true), comma(",") { this->name = name; }
 
-	inline SQLList(const std::string& name, SQLIdentifier *const token):
+	inline SQLList(const std::string& name, SQLToken *const token):
 			SQLList(token, name) { }
-	inline SQLList(const std::string& name, std::unique_ptr<SQLIdentifier> token):
+	inline SQLList(const std::string& name, std::unique_ptr<SQLToken> token):
 			SQLList(std::move(token), name) { }
 
 	inline virtual SQLParseResult parse(const std::string& source, size_t& index) const {

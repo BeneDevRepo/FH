@@ -3,26 +3,47 @@
 #include "Database.hpp"
 #include "SQLParser.hpp"
 
+#include <iomanip>
+#include <cstring>
+
+
 class SQLExecutor { // used as namespace
 public:
 
 static inline void execute(Database& db, const Command& command, bool& stopProgram) {
-	const std::string& type = command.name;
+	if(command.type() != Command::MAP)
+		throw std::runtime_error("Error parsing command: result is not a map");
 
-	if(type == "__exit__")
+	// const auto& commandMap = ((const CommandMap&)command).map;
+	const CommandMap& commandMap = (const CommandMap&)command;
+
+	// if(commandMap.find("_command_") == commandMap.end())
+	if(commandMap.map.find("_command_") == commandMap.map.end())
+		throw std::runtime_error("Error parsing command: command has noassociated command type");
+
+	// const Command& type = *commandMap.at("_command_");
+	const Command& type = *commandMap.map.at("_command_");
+
+	if(type.type() != Command::STRING)
+		throw std::runtime_error("Error parsing command: command type is not of type string");
+
+	const std::string& typeStr = ((const CommandString&)type).str;
+
+	if(typeStr == "exit") {
 		stopProgram = true;
-	else if(type == "__help__")
+	} else if(typeStr == "help") {
 		showHelpPage();
-	else if(type == "__create_table__")
-		executeCreateTable(db, command);
-	else if(type == "__drop_table__")
-		executeDropTable(db, command);
-	else if(type == "__select__")
-		executeSelect(db, command);
-	else if(type == "__insert__")
-		executeInsert(db, command);
-	else if(type == "__create_index__")
-		executeCreateIndex(db, command);
+	// } else if(typeStr == "create_table") {
+	// 	executeCreateTable(db, commandMap);
+	} else if(typeStr == "drop") { // drop table
+		executeDropTable(db, commandMap);
+	} else if(typeStr == "select") {
+		executeSelect(db, commandMap);
+	} else if(typeStr == "insert") {
+		executeInsert(db, commandMap);
+	} else if(typeStr == "create") { // create_index
+		executeCreateIndex(db, commandMap);
+	}
 }
 
 static inline void showHelpPage() {
@@ -38,24 +59,251 @@ static inline void showHelpPage() {
 	std::cout << " <  SELECT Column1, column2 FROM Buch;\n";
 }
 
-static inline void executeCreateTable(Database& db, const Command& command) {
-}
+// static inline void executeCreateTable(Database& db, const Command& command) {
+// }
 
-static inline void executeDropTable(Database& db, const Command& command) {
+static inline void executeDropTable(Database& db, const CommandMap& command) {
 	db.drop();
 }
 
-static inline void executeSelect(Database& db, const Command& command) {
-	for(const auto buch : db) {
-		std::cout << buch << "\n";
+// Function to print a single database-row using a sorted list of columns:
+static inline void printRow(const Buch& row, const std::vector<const Buch::Column*>& columns) {
+	std::cout << "| ";
+
+	for(const auto& columnMeta : columns) {
+		const size_t& columnSize = columnMeta->size; // for cleaner code; will probably get optimized away
+		const std::string& columnName = columnMeta->name; // extract column name
+
+		if(columnMeta->type == Buch::Column::STRING)
+			std::cout << std::setw(columnSize) << row.getString(columnName) << " | "; // print column
+		else /* if type == Buch::Column::INTEGER */
+			std::cout << std::setw(columnSize) << row.getInt(columnName) << " | "; // print column
+	}
+
+	std::cout << "\n";
+}
+
+static inline void executeSelect(Database& db, const CommandMap& command) {
+	const std::unordered_map<std::string, std::unique_ptr<Command>>& map = command.map; // extract hashmap
+
+	const bool explicitColumns = map.find("_columns_") != map.end(); // true if a list of columns is specified, false if * is used
+
+	// Generate a list of column metadata onjects for all columns that should be printed:
+	std::vector<const Buch::Column*> columnMeta; // sorted list of metadata for columns stat should be printed
+	if(explicitColumns) {
+		// validate that columns is a List:
+		if(map.at("_columns_")->type() != Command::LIST)
+			throw std::runtime_error("Error executing Select: invalid command tree 2");
+
+		const CommandList& columns = (CommandList&)*map.at("_columns_"); // extract column list
+
+		// validate column list:
+		for(const auto& column : columns.list) {
+			// validate that current colummn name Entry is actually a string:
+			if(column->type() != Command::STRING)
+				throw std::runtime_error("Error executing Select: invalid command tree: Column name not parsed");
+
+			// validate that column name string is a valid column name:
+			const std::string& columnName = ((CommandString&)*column).str;
+			// if(Buch::columns.find(columnName) == Buch::columns.end())
+			if(!Buch::hasColumn(columnName))
+				throw std::runtime_error("Error executing Select: invalid column name <" + columnName + ">");
+		}
+
+		// use column names to create list of column metadata objects:
+		for(const auto& column : columns.list) {
+			const std::string& columnName = ((CommandString&)*column).str; // extract column name
+			columnMeta.push_back(&Buch::columnInfo(columnName));
+		}
+	} else {
+		// no explicit columns were specified. add all columns of Buch in correct order instead:
+		for (const std::string& columnName : { "autor", "titel", "verlagsname", "erscheinungsjahr", "erscheinungsort", "isbn" })
+			columnMeta.push_back(&Buch::columnInfo(columnName));
+	}
+
+
+
+	// print table header:
+	std::cout << "| ";
+	for(const auto& columnMeta : columnMeta)
+		std::cout << std::setw(columnMeta->size) << columnMeta->name << " | ";
+	std::cout << "\n";
+
+	// print horizontal separator:
+	std::cout << "+ ";
+	for(const auto& columnMeta : columnMeta) {
+		for(size_t i = 0; i < columnMeta->size; i++)
+			std::cout << "-";
+		std::cout << " + ";
+	}
+	std::cout << "\n";
+
+
+	const bool sort = map.find("_sort_") != map.end();
+	if(sort) {
+		// print rows sorted by index:
+		const Command& sortParams = *map.at("_sort_");
+
+		if(sortParams.type() != Command::MAP)
+			throw std::runtime_error("Error extracting sort parameters");
+		
+		const std::unordered_map<std::string, std::unique_ptr<Command>>& sortMap = ((CommandMap&)sortParams).map; // map of sort parameters
+
+		if(sortMap.find("_sort_column_") == sortMap.end())
+			throw std::runtime_error("Error executing sorted select: could not extract column name");
+		
+		const Command& columnNameC = *sortMap.at("_sort_column_");
+
+		if(columnNameC.type() != Command::STRING)
+			throw std::runtime_error("Error executing sorted select: column name is not a string");
+		
+		const std::string& columnName = ((CommandString&)columnNameC).str;
+
+		if(!db.hasIndex(columnName))
+			throw std::runtime_error("Error: Select: could not sort by \"" + columnName + "\" (column is not indexed)");
+		
+		const Index& index = db.getIndex(columnName);
+		
+		
+		const Command& sortDirC = *sortMap.at("_sort_direction_");
+
+		if(sortDirC.type() != Command::STRING)
+			throw std::runtime_error("Error executing sorted select: sorting direction is not a string");
+		
+		const std::string& sortDir = ((CommandString&)sortDirC).str;
+
+		const bool ascending = sortDir == "asc";
+
+		if(ascending) {
+			for(const auto& entry : index) {
+				printRow(db.getRow(entry.pos()), columnMeta);
+			}
+		} else { // descending:
+			for(auto it = index.end(); it != index.begin(); ) {
+				--it;
+				printRow(db.getRow(it->pos()), columnMeta);
+			}
+		}
+		
+
+	} else {
+		// print rows in storage order:
+
+		// print selected columns, row by row:
+		for(const auto buch : db) {
+			printRow(buch, columnMeta);
+		}
 	}
 }
 
-static inline void executeInsert(Database& db, const Command& command) {
-	db.insert(Buch("Autor", "Titel", "Verlag", 1985, "Erscheinungsort", "ISBN"));
+
+/*************************************
+ * INSERT SQL Command executor
+ */
+static inline void executeInsert(Database& db, const CommandMap& command) {
+	// db.insert(Buch("Autor", "Titel", "Verlagsname", 1985, "Erscheinungsort", "ISBN"));
+
+	const std::unordered_map<std::string, std::unique_ptr<Command>>& map = command.map; // extract hashmap
+
+	const bool explicitColumns = map.find("_columns_") != map.end(); // true if a list of columns is specified
+
+	/**
+	 * Generate a list of column metadata onjects for all columns that were explicitly or implicitly specified:
+	 */
+	std::vector<const Buch::Column*> columnMeta; // sorted list of metadata for columns stat should be printed
+	if(explicitColumns) {
+		// validate that columns is a List:
+		if(map.at("_columns_")->type() != Command::LIST)
+			throw std::runtime_error("Error executing Insert: invalid command tree 2");
+
+		const CommandList& columns = (CommandList&)*map.at("_columns_"); // extract column list
+
+		// validate column list:
+		for(const auto& column : columns.list) {
+			// validate that current colummn name Entry is actually a string:
+			if(column->type() != Command::STRING)
+				throw std::runtime_error("Error executing Insert: invalid command tree: Column name not parsed");
+
+			const std::string& columnName = ((CommandString&)*column).str;
+
+			// validate that the specified column actually exists:
+			if(!Buch::hasColumn(columnName))
+				throw std::runtime_error("Error executing Insert: invalid column name <" + columnName + ">");
+		}
+
+		// use column names to create list of column metadata objects:
+		for(const auto& column : columns.list) {
+			const std::string& columnName = ((CommandString&)*column).str; // extract column name
+			columnMeta.push_back(&Buch::columnInfo(columnName));
+		}
+	}
+	else // Otherwise: no explicit columns specified; use list of all columns instead:
+	{
+		// no explicit columns were specified. add all columns of Buch in correct order instead:
+		for (const std::string& columnName : { "autor", "titel", "verlagsname", "erscheinungsjahr", "erscheinungsort", "isbn" })
+			columnMeta.push_back(&Buch::columnInfo(columnName));
+	}
+
+
+	std::cout << "Inserting into: ";
+	for(const auto& col : columnMeta) {
+		std::cout << col->name << ", ";
+	}
+	std::cout << "\n";
+
+
+	/**
+	 * Extract Values to be inserted into their corresponding columns:
+	*/
+	// validate that _values_ exists in command map:
+	if(map.find("_values_") == map.end()) // true if a list of columns is specified
+		throw std::runtime_error("Error executing insert: no values found");
+	
+	// validate that _values_ field is of type List:
+	if(map.at("_values_")->type() != Command::LIST)
+		throw std::runtime_error("Error executing insert: invalid _values_ field");
+
+	const std::vector<std::unique_ptr<Command>>& values = ((CommandList&)*map.at("_values_")).list; // extract values list
+
+
+	// validate number of arguments:
+	if(columnMeta.size() != values.size())
+		throw std::runtime_error("Could not insert: Number of specified columns does not match number of provided values");
+
+
+	Buch newBook; // new column
+
+	// --- populate new row:
+	for(size_t i = 0; i < columnMeta.size(); i++) {
+		const Buch::Column& col = *columnMeta[i];
+		const Command& val = *values[i];
+		// validate that current colummn name Entry is actually a string:
+
+		void* dest = ((char*)&newBook) + col.offset;
+
+		switch(col.type) {
+		case Buch::Column::STRING:
+			{
+				if(val.type() != Command::STRING)
+					throw std::runtime_error("Error: Insert: could not insert non-string value into column \"" + col.name + "\"");
+
+				const std::string& src = ((CommandString&)val).str;
+				strncpy((char*)dest, src.c_str(), col.size);
+			}
+			break;
+		case Buch::Column::INTEGER:
+			if(val.type() != Command::INTEGER)
+				throw std::runtime_error("Error: Insert: could not insert non-integer value into column \"" + col.name + "\"");
+
+			*(int*)dest = ((CommandInt&)val).value;
+			break;
+		}
+	}
+
+	db.insert(newBook); // insert new row
 }
 
-static inline void executeCreateIndex(Database& db, const Command& command) {
+static inline void executeCreateIndex(Database& db, const CommandMap& command) {
 	db.createIndex("Autor");
 }
 

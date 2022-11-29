@@ -42,10 +42,15 @@ void DbCLI::run() {
 		if(result.success()) {
 			// Command is valid: execute:
 			std::cout << "<< " << "Success" << "\n";
-			SQLExecutor::execute(db, command, stop);
+
+			try {
+				SQLExecutor::execute(db, command, stop);
+			} catch(const std::exception& e) {
+				std::cout << "<< Execution Error: " << e.what() << "\n";
+			}
 		} else {
 			// Command is invalid: ERROR:
-			std::cout << "<< " << "ERROR" << "\n";
+			std::cout << "<< Syntax Error" << "\n";
 		}
 	}
 

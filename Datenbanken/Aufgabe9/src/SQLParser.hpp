@@ -10,15 +10,20 @@
 
 
 std::ostream& operator<<(std::ostream& cout, const std::unique_ptr<Command>& command) {
-	if(command->name.size() > 0)
-		cout << command->name << ": ";
+	// if(command->name.size() > 0)
+	// 	cout << command->name << ": ";
 
 	switch(command->type()) {
 		case Command::Type::NULL_:
 			cout << "<null>";
 			break;
+
 		case Command::Type::STRING:
-			cout << ((CommandString*)command.get())->str;
+			cout << "\'" << ((CommandString*)command.get())->str << "\'";
+			break;
+
+		case Command::Type::INTEGER:
+			cout << ((CommandInt*)command.get())->value;
 			break;
 
 		case Command::Type::LIST:
@@ -31,6 +36,20 @@ std::ostream& operator<<(std::ostream& cout, const std::unique_ptr<Command>& com
 						cout << ", ";
 				}
 				cout << "]";
+			}
+			break;
+
+		case Command::Type::MAP:
+			{
+				const auto& map = ((CommandMap*)command.get())->map;
+				cout << "{";
+				size_t i = 0;
+				for(const auto& element : map) {
+					std::cout << element.first << ": " << element.second;
+					if(i < map.size() - 1)
+						cout << ", ";
+				}
+				cout << "}";
 			}
 			break;
 	}
@@ -47,25 +66,22 @@ private:
 public:
 	inline SQLParser() {
 		SQLToken* exit = new SQLCommand(
-			std::string("__exit__"), // Command Name
 			new SQLSpace(true),
-			new SQLLiteral("EXIT"),
+			new SQLLiteral("EXIT", "_command_"), // Command Name
 			new SQLSpace(true),
 			new SQLLiteral(";")
 		);
 
 		SQLToken* help = new SQLCommand(
-			std::string("__help__"), // Command Name
 			new SQLSpace(true),
-			new SQLLiteral("HELP"),
+			new SQLLiteral("HELP", "_command_"), // Command Name
 			new SQLSpace(true),
 			new SQLLiteral(";")
 		);
 
 		SQLToken* create_table = new SQLCommand(
-			std::string("__create_table__"), // Command Name
 			new SQLSpace(true),
-			new SQLLiteral("CREATE"),
+			new SQLLiteral("CREATE", "_command_"), // Command Name
 			new SQLSpace,
 			new SQLLiteral("TABLE"),
 			new SQLSpace,
@@ -75,9 +91,8 @@ public:
 		);
 
 		SQLToken* drop_table = new SQLCommand(
-			std::string("__drop_table__"), // Command Name
 			new SQLSpace(true),
-			new SQLLiteral("DROP"),
+			new SQLLiteral("DROP", "_command_"), // Command Name
 			new SQLSpace,
 			new SQLLiteral("TABLE"),
 			new SQLSpace,
@@ -87,16 +102,17 @@ public:
 		);
 
 		SQLToken* select = new SQLCommand(
-			std::string("__select__"), // Command Name
 			new SQLSpace(true),
-			new SQLLiteral("SELECT"),
+			new SQLLiteral("SELECT", "_command_"), // command name
 			new SQLSpace,
 
 			// columns to select:
 			new SQLVariant(
 				std::string("_columns_"),
 				new SQLLiteral("*"),
-				new SQLList(new SQLIdentifier)
+				new SQLList(
+					new SQLIdentifier
+				)
 			),
 
 			new SQLSpace(true),
@@ -109,14 +125,35 @@ public:
 				new SQLIdentifier
 			),
 
+
+			new SQLOptional(
+				std::string("_sort_"),
+				new SQLCommand(
+					// new SQLSpace,
+					new SQLVariant(
+						new SQLLiteral("SORT"),
+						new SQLLiteral("ORDER")
+					),
+					new SQLSpace,
+					new SQLLiteral("BY"),
+					new SQLSpace,
+					new SQLIdentifier("_sort_column_"),
+					new SQLSpace,
+					new SQLVariant(
+						std::string("_sort_direction_"),
+						new SQLLiteral("ASC", " "),
+						new SQLLiteral("DESC", " ")
+					)
+				)
+			),
+
 			new SQLSpace(true),
 			new SQLLiteral(";")
 		);
 
 		SQLToken* insert = new SQLCommand(
-			std::string("__insert__"), // Command Name
 			new SQLSpace(true),
-			new SQLLiteral("INSERT"),
+			new SQLLiteral("INSERT", "_command_"), // Command Name
 			new SQLSpace,
 			new SQLLiteral("INTO"),
 			new SQLSpace,
@@ -141,7 +178,11 @@ public:
 			new SQLParanthesis(
 				new SQLList(
 					std::string("_values_"),
-					new SQLIdentifier
+					// new SQLIdentifier
+					new SQLVariant(
+						new SQLString,
+						new SQLInteger
+					)
 				)
 			),
 
@@ -150,9 +191,8 @@ public:
 		);
 
 		SQLToken* create_index = new SQLCommand(
-			std::string("__create_index__"), // Command Name
 			new SQLSpace(true),
-			new SQLLiteral("CREATE"),
+			new SQLLiteral("CREATE", "_command_"), // Command Name
 			new SQLSpace,
 			new SQLOptional(
 				new SQLCommand(

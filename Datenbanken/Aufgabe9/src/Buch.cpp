@@ -31,6 +31,38 @@ Buch::Buch(
 	strncpy(this->ISBN, ISBN, 15);
 }
 
+
+// --- populate static reflection hashmap:
+#define COL_DESC(COLUMN) \
+	{ \
+		toLowerCase(#COLUMN), \
+		Column { \
+			#COLUMN, \
+			std::is_same_v<int, decltype(COLUMN)> \
+				? Column::INTEGER \
+				: Column::STRING, \
+			offsetof(Buch, COLUMN), \
+			std::is_same_v<int, decltype(COLUMN)> \
+				? 21 \
+				: sizeof(COLUMN), \
+		} \
+	}
+
+const std::unordered_map<std::string, Buch::Column> Buch::columns {
+	COL_DESC(Autor), // char Autor[21];
+
+	COL_DESC(Titel), // char Titel[41];
+	COL_DESC(Verlagsname), // char Verlagsname[21];
+	COL_DESC(Erscheinungsjahr), // int Erscheinungsjahr;
+	COL_DESC(Erscheinungsort), // char Erscheinungsort[41];
+	COL_DESC(ISBN) // char ISBN[15];
+};
+
+#undef STR_COL
+
+
+
+// -- ostream operator for debugging only:
 std::ostream& operator<<(std::ostream& cout, const Buch& b) {
 	// lambda um char[] in string_view umzuwandeln:
 	constexpr auto strv =
@@ -46,38 +78,3 @@ std::ostream& operator<<(std::ostream& cout, const Buch& b) {
 		<< ", ISBN: " << strv(b.ISBN, 15);
 	return cout;
 }
-
-#define COL_DESC(COLUMN) \
-	{ \
-		toLowerCase(#COLUMN), \
-		Column { \
-			#COLUMN, \
-			std::is_same_v<int, decltype(COLUMN)> \
-				? Column::INTEGER \
-				: Column::STRING, \
-			offsetof(Buch, COLUMN), \
-			sizeof(COLUMN) \
-		} \
-	}
-
-const std::unordered_map<std::string, Buch::Column> Buch::columns {
-	COL_DESC(Autor), // char Autor[21];
-
-	COL_DESC(Titel), // char Titel[41];
-	COL_DESC(Verlagsname), // char Verlagsname[21];
-	COL_DESC(Erscheinungsjahr), // int Erscheinungsjahr;
-	COL_DESC(Erscheinungsort), // char Erscheinungsort[41];
-	COL_DESC(ISBN) // char ISBN[15];
-};
-
-// const std::vector<Buch::Column> Buch::columns {
-// 	COL_DESC(Autor), // char Autor[21];
-
-// 	COL_DESC(Titel), // char Titel[41];
-// 	COL_DESC(Verlagsname), // char Verlagsname[21];
-// 	COL_DESC(Erscheinungsjahr), // int Erscheinungsjahr;
-// 	COL_DESC(Erscheinungsort), // char Erscheinungsort[41];
-// 	COL_DESC(ISBN) // char ISBN[15];
-// };
-
-#undef STR_COL
