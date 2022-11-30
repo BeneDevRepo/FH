@@ -72,7 +72,7 @@ egrep "^([[:upper:]][[:lower:][:digit:]]+([ -][[:upper:]][[:lower:][:digit:]]+)?
 		fi
 		
 		# Testen ob nutzer bereits existiert:
-		if ! id "$loginname" > /dev/null 2>/dev/null; then
+		if id "$loginname" > /dev/null 2>&1; then
 			echo "Nutzer existiert bereits"
 			continue
 		fi
