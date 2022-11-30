@@ -93,14 +93,14 @@ egrep "^([[:upper:]][[:lower:][:digit:]]+([ -][[:upper:]][[:lower:][:digit:]]+)?
 
 
 		# Nutzer hinzufuegen:
-		#useradd -c "$number" "$loginname"
+		useradd -c "$number" "$loginname"
 		if [ $? -ne 0 ]; then
 			echo "Nutzer konnte nicht hinzugefuegt werden"
 			continue
 		fi
 		
 		# Passwort setzen:
-		#echo ${loginname}:${password} | chpasswd 2>/dev/null
+		echo ${loginname}:${password} | chpasswd 2>/dev/null
 		if [ $? -ne 0 ]; then
 			echo "Passwort konnte nicht gesetzt werden"
 			continue
