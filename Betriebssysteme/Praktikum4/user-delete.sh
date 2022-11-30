@@ -59,7 +59,7 @@ cat "$users" | tr ';' ' ' | {
 		# echo "$name $number"
 		
 		# Nutzer entfernen:
-		userdel -r "$loginname"
+		userdel -r "${name,,}"
 		
 	done
 	#< "$users"
