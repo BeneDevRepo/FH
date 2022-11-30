@@ -53,13 +53,13 @@ egrep "^([[:upper:]][[:lower:][:digit:]]+([ -][[:upper:]][[:lower:][:digit:]]+)?
 		### Start eines Durchgangs fuer einen einzelnen Nutzer:
 		((versuche++))
 
-		echo -n "$name, " >> "$outfile" # nachname speichern
-		echo -n "$firstname, " >> "$outfile"
-		echo -n "$number, " >> "$outfile"
+		# echo -n "$name, " >> "$outfile" # nachname speichern
+		# echo -n "$firstname, " >> "$outfile"
+		# echo -n "$number, " >> "$outfile"
 		
 		# Nutzername erstellen:
 		loginname="${name,,}"
-		echo -n "$loginname, " >> "$outfile" # loginname speichern
+		
 		
 		
 		# Nutzer ausdrucken:
@@ -76,7 +76,7 @@ egrep "^([[:upper:]][[:lower:][:digit:]]+([ -][[:upper:]][[:lower:][:digit:]]+)?
 			echo "Nutzer existiert bereits"
 			continue
 		fi
-		
+
 		# testen ob user nicht mit home-verzeichnis angelegt werden kann:
 		if [ -d "/home/$firstname" ]; then
 			echo "user hat bereits ein home-verzeichnis"
@@ -85,7 +85,6 @@ egrep "^([[:upper:]][[:lower:][:digit:]]+([ -][[:upper:]][[:lower:][:digit:]]+)?
 		
 		# Passwort erstellen:
 		password="$(pwgen 8 1)"
-		echo -n "$password" >> "$outfile" # passwort speichern
 		if [ $? -ne 0 ]; then
 			echo "Passwort konnte nicht generiert werden"
 			exit 3
@@ -94,20 +93,25 @@ egrep "^([[:upper:]][[:lower:][:digit:]]+([ -][[:upper:]][[:lower:][:digit:]]+)?
 
 
 		# Nutzer hinzufuegen:
-		useradd -c "$number" "$loginname"
+		#useradd -c "$number" "$loginname"
 		if [ $? -ne 0 ]; then
 			echo "Nutzer konnte nicht hinzugefuegt werden"
 			continue
 		fi
 		
 		# Passwort setzen:
-		echo ${loginname}:${password} | chpasswd 2>/dev/null
+		#echo ${loginname}:${password} | chpasswd 2>/dev/null
 		if [ $? -ne 0 ]; then
 			echo "Passwort konnte nicht gesetzt werden"
 			continue
 		fi
-
-		echo "ERFOLG" >> "$outfile" # Eintrag als erfolgreich markieren
+		
+		
+		echo -n "$name;" >> "$outfile" # nachname speichern
+		echo -n "$firstname;" >> "$outfile"
+		echo -n "$number;" >> "$outfile"
+		echo -n "$loginname;" >> "$outfile" # loginname speichern
+		echo "$password" >> "$outfile" # passwort speichern
 		
 
 		((erfolge++))
