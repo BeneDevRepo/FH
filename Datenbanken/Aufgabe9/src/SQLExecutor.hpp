@@ -43,20 +43,25 @@ static inline void execute(Database& db, const Command& command, bool& stopProgr
 		executeInsert(db, commandMap);
 	} else if(typeStr == "create") { // create_index
 		executeCreateIndex(db, commandMap);
+	} else if(typeStr == "find") {
+		executeFind(db, commandMap);
 	}
 }
 
 static inline void showHelpPage() {
 	std::cout << "<< This sql interpreter supports the following commands:\n";
 
-	std::cout << " <  EXIT; -> stops program\n";
 	std::cout << " <  HELP; -> show this help page\n";
+	std::cout << " <  EXIT; -> stops program\n";
 
-	std::cout << " <  CREATE TABLE Buch; -> creates the example table\n";
-	std::cout << " <  DROP TABLE Buch; -> deletes the example table\n";
+	std::cout << " <  DROP TABLE Buch; -> deletes the table\n";
 
-	std::cout << " <  SELECT * FROM Buch;\n";
-	std::cout << " <  SELECT Column1, column2 FROM Buch;\n";
+	std::cout << " <  SELECT * FROM Buch [ORDER BY ... ASC/DESC] [WHERE <column> = \"value\"];\n";
+	std::cout << " <  SELECT Column1, column... FROM Buch [ORDER BY ... ASC/DESC] [WHERE <column> = \"value\"];\n";
+
+	std::cout << " <  INSERT INTO Buch [(columns...)] values(values...);\n";
+
+	std::cout << " <  CREATE INDEX <name> ON Buch(<column>);\n";
 }
 
 // static inline void executeCreateTable(Database& db, const Command& command) {
@@ -123,6 +128,53 @@ static inline void executeSelect(Database& db, const CommandMap& command) {
 
 
 
+	// Extract Where-Clause information:
+	const bool filter = command.map.find("_where_") != command.map.end(); // true if where-clause was found
+	const std::string* filterColumn; // where comparison column name
+	const std::string* filterLiteral; // where comparison literal
+
+	if(filter) {
+		const Command& whereOptions = *command.map.at("_where_");
+
+		if(whereOptions.type() != Command::MAP)
+			throw std::runtime_error("Could not execute select: where clause is not a map");
+		
+		const std::unordered_map<std::string, std::unique_ptr<Command>>& whereMap = ((CommandMap&)whereOptions).map;
+
+		// check if _where_column_ entry exists:
+		if(whereMap.find("_where_column_") == whereMap.end())
+			throw std::runtime_error("Could not execute select: where clause does not contain column name");
+		
+		const Command& filterColumnCommand = *whereMap.at("_where_column_");
+
+		if(filterColumnCommand.type() != Command::STRING)
+			throw std::runtime_error("Could no execute select: where clause column name is not a string");
+		
+		filterColumn = &((CommandString&)filterColumnCommand).str; // extract column name
+
+		// check if column name is valid:
+		if(!Buch::hasColumn(*filterColumn))
+			throw std::runtime_error("Could not execute select: Where clause: invalid column name");
+		
+		if(Buch::columnInfo(*filterColumn).type != Buch::Column::STRING)
+			throw std::runtime_error("Could not execute select: Where clause: column content is not a string");
+
+
+
+		// check if _where_literal_ entry exists:
+		if(whereMap.find("_where_literal_") == whereMap.end())
+			throw std::runtime_error("Could not execute select: where clause does not contain comparison value name");
+
+		const Command& filterLiteralCommand = *whereMap.at("_where_literal_");
+
+		if(filterLiteralCommand.type() != Command::STRING)
+			throw std::runtime_error("Could no execute select: where clause literal is not a string");
+		
+		filterLiteral = &((CommandString&)filterLiteralCommand).str; // extract comparison literal
+	}
+
+	// std::cout << "Where <" + *filterColumn + "> = " + *filterLiteral + "\n";
+
 	// print table header:
 	std::cout << "| ";
 	for(const auto& columnMeta : columnMeta)
@@ -176,11 +228,17 @@ static inline void executeSelect(Database& db, const CommandMap& command) {
 
 		if(ascending) {
 			for(const auto& entry : index) {
+				if(filter)
+					if(db.getRow(entry.pos()).getString(*filterColumn) != *filterLiteral)
+						continue;
 				printRow(db.getRow(entry.pos()), columnMeta);
 			}
 		} else { // descending:
 			for(auto it = index.end(); it != index.begin(); ) {
 				--it;
+				if(filter)
+					if(db.getRow(it->pos()).getString(*filterColumn) != *filterLiteral)
+						continue;
 				printRow(db.getRow(it->pos()), columnMeta);
 			}
 		}
@@ -191,6 +249,9 @@ static inline void executeSelect(Database& db, const CommandMap& command) {
 
 		// print selected columns, row by row:
 		for(const auto buch : db) {
+			if(filter)
+				if(buch.getString(*filterColumn) != *filterLiteral)
+					continue;
 			printRow(buch, columnMeta);
 		}
 	}
@@ -329,6 +390,53 @@ static inline void executeCreateIndex(Database& db, const CommandMap& command) {
 
 
 	db.createIndex(columnString);
+}
+
+
+static inline void executeFind(Database& db, const CommandMap& command) {
+	const std::unordered_map<std::string, std::unique_ptr<Command>>& whereMap = command.map; // extract hashmap
+
+	// Extract Where-Clause information:
+
+
+	// const std::unordered_map<std::string, std::unique_ptr<Command>>& whereMap = ((CommandMap&)whereOptions).map;
+
+	// check if _where_column_ entry exists:
+	if(whereMap.find("_where_column_") == whereMap.end())
+		throw std::runtime_error("Could not execute find: where clause does not contain column name");
+	
+	const Command& filterColumnCommand = *whereMap.at("_where_column_");
+
+	if(filterColumnCommand.type() != Command::STRING)
+		throw std::runtime_error("Could no execute find: where clause column name is not a string");
+	
+	const std::string& filterColumn = ((CommandString&)filterColumnCommand).str; // extract column name
+
+	// check if column name is valid:
+	if(!Buch::hasColumn(filterColumn))
+		throw std::runtime_error("Could not execute find: Where clause: invalid column name");
+
+	if(Buch::columnInfo(filterColumn).type != Buch::Column::STRING)
+		throw std::runtime_error("Could not execute find: Where clause: column name is not a string");
+
+
+
+	// check if _where_literal_ entry exists:
+	if(whereMap.find("_where_literal_") == whereMap.end())
+		throw std::runtime_error("Could not execute find: where clause does not contain comparison value name");
+
+	const Command& filterLiteralCommand = *whereMap.at("_where_literal_");
+
+	if(filterLiteralCommand.type() != Command::STRING)
+		throw std::runtime_error("Could no execute find: where clause literal is not a string");
+
+	const std::string& filterLiteral = ((CommandString&)filterLiteralCommand).str; // extract comparison literal
+
+	const size_t ind = db.getIndex(filterColumn).find(filterLiteral);
+
+	std::cout << "Result: " << db.getRow(ind) << "\n";
+
+	// std::cout << "Find " << filterColumn << " = " << filterLiteral << "\n";
 }
 
 };

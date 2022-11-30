@@ -7,7 +7,8 @@
 
 
 void DbCLI::run() {
-	std::cout << "BeneSQL CLI [version 1.0.0]\n\n";
+	std::cout << "BeneSQL CLI [version 1.0.0]\n";
+	std::cout << "type HELP; for help\n\n";
 
 
 	// lambda to read in a command line by line until a terminating semicolon is found:
@@ -40,10 +41,10 @@ void DbCLI::run() {
 		// const std::string& commandType = command.name;
 	
 		if(result.success()) {
-			// Command is valid: execute:
-			std::cout << "<< " << "Success" << "\n";
+			// std::cout << "<< " << "Success" << "\n";
 
 			try {
+				// Command is valid: execute:
 				SQLExecutor::execute(db, command, stop);
 			} catch(const std::exception& e) {
 				std::cout << "<< Execution Error: " << e.what() << "\n";

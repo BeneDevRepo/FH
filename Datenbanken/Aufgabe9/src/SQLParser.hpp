@@ -10,9 +10,6 @@
 
 
 std::ostream& operator<<(std::ostream& cout, const std::unique_ptr<Command>& command) {
-	// if(command->name.size() > 0)
-	// 	cout << command->name << ": ";
-
 	switch(command->type()) {
 		case Command::Type::NULL_:
 			cout << "<null>";
@@ -148,6 +145,86 @@ public:
 			),
 
 			new SQLSpace(true),
+			new SQLOptional(
+				std::string("_where_"),
+				new SQLCommand(
+					new SQLLiteral("WHERE"),
+					new SQLSpace,
+					new SQLIdentifier("_where_column_"),
+					new SQLSpace(true),
+					new SQLLiteral("="),
+					new SQLSpace(true),
+					new SQLString("_where_literal_")
+				)
+			),
+
+			new SQLSpace(true),
+			new SQLLiteral(";")
+		);
+	
+		SQLToken* select_v2 = new SQLCommand(
+			new SQLSpace(true),
+			new SQLLiteral("SELECT", "_command_"), // command name
+			new SQLSpace,
+
+			// columns to select:
+			new SQLVariant(
+				std::string("_columns_"),
+				new SQLLiteral("*"),
+				new SQLList(
+					new SQLIdentifier
+				)
+			),
+
+			new SQLSpace(true),
+			new SQLLiteral("FROM"),
+			new SQLSpace,
+
+			// source table(s):
+			new SQLList(
+				std::string("_sources_"),
+				new SQLIdentifier
+			),
+
+			new SQLSpace(true),
+
+			new SQLOptional(
+				std::string("_where_"),
+				new SQLCommand(
+					new SQLLiteral("WHERE"),
+					new SQLSpace,
+					new SQLIdentifier("_where_column_"),
+					new SQLSpace(true),
+					new SQLLiteral("="),
+					new SQLSpace(true),
+					new SQLString("_where_literal_")
+				)
+			),
+
+			new SQLSpace(true),
+
+			new SQLOptional(
+				std::string("_sort_"),
+				new SQLCommand(
+					// new SQLSpace,
+					new SQLVariant(
+						new SQLLiteral("SORT"),
+						new SQLLiteral("ORDER")
+					),
+					new SQLSpace,
+					new SQLLiteral("BY"),
+					new SQLSpace,
+					new SQLIdentifier("_sort_column_"),
+					new SQLSpace,
+					new SQLVariant(
+						std::string("_sort_direction_"),
+						new SQLLiteral("ASC", " "),
+						new SQLLiteral("DESC", " ")
+					)
+				)
+			),
+
+			new SQLSpace(true),
 			new SQLLiteral(";")
 		);
 
@@ -220,14 +297,28 @@ public:
 			new SQLLiteral(";")
 		);
 
+
+		SQLToken* find = new SQLCommand(
+			new SQLSpace(true),
+			new SQLLiteral("FIND", "_command_"),
+			new SQLSpace,
+			new SQLIdentifier("_where_column_"),
+			new SQLSpace(true),
+			new SQLLiteral("="),
+			new SQLSpace(true),
+			new SQLString("_where_literal_")
+		);
+
 		commands = std::make_unique<SQLVariant>(
 			exit,
 			help,
 			create_table,
 			drop_table,
 			select,
+			select_v2,
 			insert,
-			create_index
+			create_index,
+			find
 		);
 	}
 

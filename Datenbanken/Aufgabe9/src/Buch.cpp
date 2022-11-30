@@ -32,6 +32,9 @@ Buch::Buch(
 }
 
 
+
+//##################   Static reflection:
+
 // --- populate static reflection hashmap:
 #define COL_DESC(COLUMN) \
 	{ \

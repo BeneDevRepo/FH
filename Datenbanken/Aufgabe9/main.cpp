@@ -7,39 +7,29 @@ int main() {
 
 	cli.run();
 	
-	// Database db;
-	// db.drop();
-	// db.insert(Buch("J.K.Rowling", "Harry Potter and the Philosopher's stone", "Bloomsbury", 2014, "UK", "978-1-4088-5589"));
-	// db.insert(Buch("J.K.Rowling", "Harry Potter and the Chamber of Secrets", "Bloomsbury", 2014, "UK", "978-1-4088-5566"));
-	// db.insert(Buch("J.K.Rowling", "Harry Potter and the Prisoner of Askaban", "Bloomsbury", 2014, "UK", "978-1-4088-5567"));
-	// db.insert(Buch("J.K.Rowling", "Harry Potter and the Goblet of Fire", "Bloomsbury", 2014, "UK", "978-1-4088-5568"));
-	// db.insert(Buch("J.K.Rowling", "Harry Potter and the Order of the Phoenix", "Bloomsbury", 2014, "UK", "978-1-4088-5569"));
-	// db.insert(Buch("J.K.Rowling", "Harry Potter and the Half Blood Prince", "Bloomsbury", 2014, "UK", "978-1-4088-5570"));
-	// db.insert(Buch("J.K.Rowling", "Harry Potter and the Deathly Hallows", "Bloomsbury", 2014, "UK", "978-1-4088-5571"));
-
-	// db.createIndex();
-
-
-	// for(const Buch& b : buchDB)
-	// 	std::cout << b << "\n";
-
-	// for(const Index& i : indexDB)
-	// 	std::cout << i.Position << ": " << std::string_view(i.Ordnungsbegriff, strnlen(i.Ordnungsbegriff, 41)) << "\n";
-
-	// const auto testSearch = [&](const char *const name) {
-	// 	std::cout << "Searching \"" << name << "\":\n";
-	// 	std::cout << " >> " << db.findOne(name) << "\n";
-	// };
-
-	// testSearch("Harry Potter and the Philosopher's stone");
-	// testSearch("Harry Potter and the Chamber of Secrets");
-	// testSearch("Harry Potter and the Prisoner of Askaban");
-	// testSearch("Harry Potter and the Goblet of Fire");
-	// testSearch("Harry Potter and the Order of the Phoenix");
-	// testSearch("Harry Potter and the Half Blood Prince");
-	// testSearch("Harry Potter and the Deathly Hallows");
-
-	// db.printAllDesc();
-	
     return 0;
 }
+
+/*
+
+insert into Buch values('Franz Ferdinand', 'Harry Potter 1', 'Cornelsen', 1984, 'Berlin', '987-3-00-065785');
+insert into Buch values('Anna liebert', 'Monster', 'Bandai', 2002, 'Muenchen', '657-6-13-678098');
+insert into Buch values('Beate Becker', 'Harry Potter 2', 'OReily', 1967, 'Frankfurt', '987-0-13-7569789');
+insert into Buch values('Carsten c.', 'Sozialwissenschaften II', 'Cornelsen', 1813, 'Amsterdam', '907-2-76-879546');
+insert into Buch values('Dagobert Duck', 'Ducktales', 'OReilly', 2026, 'Entenhausen', '678-0-50-789754');
+insert into Buch values('Faust Autor', 'Faust', 'Cornelsen', 2026, 'Entenhausen', '678-0-50-789754');
+
+select * from buch;
+
+create index a on Buch(Autor);
+create index a on Buch(Titel);
+create index a on Buch(Verlagsname);
+create index a on Buch(Erscheinungsort);
+
+find Verlagsname = 'Cornelsen';
+
+select * from Buch where Verlagsname = 'Cornelsen';
+
+
+
+*/

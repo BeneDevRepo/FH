@@ -19,7 +19,7 @@ private:
 public:
 	inline IndexEntry() {}
 	inline IndexEntry(const std::string& ordnungsbegriff, const size_t position):
-		ordnungsbegriff(toLowerCase(ordnungsbegriff)), position(position) {}
+		ordnungsbegriff(ordnungsbegriff), position(position) {}
 	const std::string& value() const {
 		return ordnungsbegriff;
 	}
@@ -65,30 +65,38 @@ public:
 	}
 
 	inline size_t find(const std::string& key) const { // TODO: implement
-		if(column.size() == 0)
-			throw std::runtime_error("Error: tried using empty(invalid) Index");
-		size_t min = 0; // minimum index (inclusive)
-		size_t max = index.size(); // maximum index (exclusive)
+		for(const IndexEntry& ind : index)
+			if(ind.value() == key)
+				return ind.pos();
 
-		for(;;) {
-			if(min >= max) // no index left to test
-				throw std::runtime_error("ERROR: findBook(): key not present in Database!");
+		throw std::runtime_error("ERROR: findBook(): key \"" + key + "\" not present in Database!");
 
-			const size_t test_i = (max + min) / 2;
-			const IndexEntry& cur = index[test_i];
+		// if(column.size() == 0)
+		// 	throw std::runtime_error("Error: tried using empty(invalid) Index");
+		// size_t min = 0; // minimum index (inclusive)
+		// size_t max = index.size() - 1; // maximum index (inclusive)
 
-			// const int comp = strncmp(key, cur.value(), Buch::columns.at(indexed_column).size);
-			const int comp = strncmp(key.c_str(), cur.value().c_str(), Buch::columnInfo(this->column).size);
+		// for(;;) {
 
-			if(comp == 0)
-				return cur.pos();
-				// return buchDB[cur.Position];
+		// 	const size_t test_i = (max + min) / 2;
+		// 	const IndexEntry& cur = index[test_i];
 
-			if(comp < 0)
-				max = test_i;
-			else
-				min = test_i + 1;
-		}
+		// 	// const int comp = strncmp(key, cur.value(), Buch::columns.at(indexed_column).size);
+		// 	// const int comp = strncmp(key.c_str(), cur.value().c_str(), Buch::columnInfo(this->column).size);
+
+		// 	if(cur.value() == key)
+		// 		return cur.pos();
+		// 		// return buchDB[cur.Position];
+
+		// 	if(min >= max) // no index left to test
+		// 		// return -1;
+		// 		throw std::runtime_error("ERROR: findBook(): key \"" + key + "\" not present in Database!");
+
+		// 	if(cur.value() < key)
+		// 		max = test_i;
+		// 	else
+		// 		min = test_i + 1;
+		// }
 	}
 
 	inline const IndexEntry* begin() const {

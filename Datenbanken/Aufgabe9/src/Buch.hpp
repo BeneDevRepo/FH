@@ -27,6 +27,7 @@ struct Buch {
 		const char *const Erscheinungsort,
 		const char *const ISBN);
 
+	// ####################   Static reflection:
 public:
 	struct Column {
 		std::string name;

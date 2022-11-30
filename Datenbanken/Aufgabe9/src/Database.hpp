@@ -12,18 +12,9 @@
 
 class Database {
 private:
-	// std::string indexed_column;
-	// struct Index {
-	// 	char Ordnungsbegriff[41]{};
-	// 	size_t Position;
-	// };
-
 	// std::vector<Buch> buchDB;
 	bvector<Buch> buchDB;
 
-	// std::vector<Index> indexDB;
-	// bvector<Index> indexDB;
-	// Index indexDB;
 	std::unordered_map<std::string, Index> indices;
 
 public:
@@ -40,10 +31,10 @@ public:
 	bool hasIndex(const std::string& column) const; // returns if specified column is indexed
 	const Index& getIndex(const std::string& column) const; // returns index for specified column
 
-	// const Buch& findOne(const char *const key) const;
 	const Buch& findOne(const std::string& column, const std::string& key) const; // binary search over sorted index
 
 public:
+	// iterator for iterating over rows in memory-order:
 	class BookIterator {
 		const Database* db;
 		const Buch* it;
@@ -55,25 +46,6 @@ public:
 		inline bool operator!=(const BookIterator& other) const { return it != other.it; }
 		inline const Buch& operator*() const { return *it; }
 	};
-
 	inline BookIterator begin() const { return BookIterator(this, buchDB.data()); }
 	inline BookIterator end() const { return BookIterator(this, buchDB.data() + buchDB.size()); }
-
-	// class BookIterator {
-	// 	Database* db;
-	// 	Index* it;
-	// public:
-	// 	inline BookIterator(Database* db, Index* it): db(db), it(it) { }
-	// 	inline BookIterator operator++() { ++it; return *this; }
-	// 	inline BookIterator operator++(int) { BookIterator tmp(*this); ++(*this); return tmp; }
-	// 	inline bool operator==(const BookIterator& other) const { return it == other.it; }
-	// 	inline bool operator!=(const BookIterator& other) const { return it != other.it; }
-	// 	inline Buch& operator*() { return db->buchDB[it->Position]; }
-	// };
-
-	// inline BookIterator begin() { return BookIterator(this, indexDB.data()); }
-	// inline BookIterator end() { return BookIterator(this, indexDB.data() + indexDB.size()); }
-
-public:
-	// friend std::ostream& operator<<(std::ostream& cout, const Index& i);
 };
