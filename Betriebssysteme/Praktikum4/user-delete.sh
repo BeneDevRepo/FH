@@ -59,7 +59,10 @@ cat "$users" | tr ';' ' ' | {
 		# echo "$name $number"
 		
 		# Nutzer entfernen:
-		userdel -r "${name,,}"
+		userdel -r "${name,,}" > /dev/null 2>&1
+		if [ $? -ne 0 ]; then
+			echo "Nutzer $username konnte nicht entfernt werden"
+		fi
 		
 	done
 	#< "$users"
