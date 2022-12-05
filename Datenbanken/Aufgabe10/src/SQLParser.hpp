@@ -100,7 +100,11 @@ public:
 
 		SQLToken* show = new SQLCommand(
 			new SQLSpace(true),
-			new SQLLiteral("SHOW", "_command_"),
+			new SQLVariant(
+				std::string("_command_"),
+				new SQLLiteral("SHOW"),
+				new SQLLiteral("LIST")
+			),
 			new SQLSpace,
 			new SQLIdentifier("_target_")
 		);

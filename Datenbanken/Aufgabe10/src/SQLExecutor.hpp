@@ -14,14 +14,11 @@ static inline void execute(Database& db, const Command& command, bool& stopProgr
 	if(command.type() != Command::MAP)
 		throw std::runtime_error("Error parsing command: result is not a map");
 
-	// const auto& commandMap = ((const CommandMap&)command).map;
 	const CommandMap& commandMap = (const CommandMap&)command;
 
-	// if(commandMap.find("_command_") == commandMap.end())
 	if(commandMap.map.find("_command_") == commandMap.map.end())
 		throw std::runtime_error("Error parsing command: command has noassociated command type");
 
-	// const Command& type = *commandMap.at("_command_");
 	const Command& type = *commandMap.map.at("_command_");
 
 	if(type.type() != Command::STRING)
@@ -33,11 +30,9 @@ static inline void execute(Database& db, const Command& command, bool& stopProgr
 		stopProgram = true;
 	} else if(typeStr == "help") {
 		showHelpPage();
-	// } else if(typeStr == "create_table") {
-	// 	executeCreateTable(db, commandMap);
 	} else if(typeStr == "drop") { // drop table
 		executeDropTable(db, commandMap);
-	} else if(typeStr == "show") { // show table
+	} else if(typeStr == "show" || typeStr == "list") { // show table
 		executeShow(db, commandMap);
 	} else if(typeStr == "select") {
 		executeSelect(db, commandMap);
@@ -283,7 +278,7 @@ static inline void executeSelect(Database& db, const CommandMap& command) {
 		// print rows in storage order:
 
 		// print selected columns, row by row:
-		for(const auto buch : db) {
+		for(const auto& buch : db) {
 			if(filter)
 				if(buch.getString(*filterColumn) != *filterLiteral)
 					continue;
@@ -341,11 +336,11 @@ static inline void executeInsert(Database& db, const CommandMap& command) {
 	}
 
 
-	std::cout << "Inserting into: ";
-	for(const auto& col : columnMeta) {
-		std::cout << col->name << ", ";
-	}
-	std::cout << "\n";
+	// std::cout << "Inserting into: ";
+	// for(const auto& col : columnMeta) {
+	// 	std::cout << col->name << ", ";
+	// }
+	// std::cout << "\n";
 
 
 	/**

@@ -39,7 +39,7 @@ struct CommandInt : public Command {
 	// inline CommandString(const std::string& str) { this->str = str; }
 	// inline CommandString(const std::string& str, const std::string& name) { this->str = str; this->name = name; }
 	virtual inline Type type() const { return INTEGER; }
-	int value;
+	int value = 0;
 };
 
 struct CommandList : public Command {
@@ -72,7 +72,7 @@ private:
 
 private:
 	inline SQLParseResult(std::unique_ptr<Command>&& command): success_(true), command_(std::move(command)) { }
-	inline SQLParseResult(const std::string& error, const size_t index): success_(false), error_(error), index_(index) { }
+	inline SQLParseResult(const std::string& error, const size_t index): success_(false), index_(index), error_(error) { }
 
 public:
 	inline SQLParseResult() { }
@@ -428,7 +428,7 @@ public:
 			SQLList(std::move(token), name) { }
 
 	inline virtual SQLParseResult parse(const std::string& source, size_t& index) const {
-		const size_t index_orig = index;
+		// const size_t index_orig = index;
 
 		std::unique_ptr<CommandList> output(new CommandList);
 

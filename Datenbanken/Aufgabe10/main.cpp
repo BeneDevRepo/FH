@@ -21,6 +21,8 @@ insert into Buch values('Faust Autor', 'Faust', 'Cornelsen', 2026, 'Entenhausen'
 
 select * from buch;
 
+create index a on Buch(Erscheinungsjahr);
+
 create index a on Buch(Autor);
 create index a on Buch(Titel);
 create index a on Buch(Verlagsname);
@@ -29,6 +31,8 @@ create index a on Buch(Erscheinungsort);
 find Verlagsname = 'Cornelsen';
 
 select * from Buch where Verlagsname = 'Cornelsen';
+
+find erscheinungsjahr = 1984;
 
 
 

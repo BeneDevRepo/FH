@@ -36,16 +36,15 @@ public:
 public:
 	// iterator for iterating over rows in memory-order:
 	class BookIterator {
-		const Database* db;
 		const Buch* it;
 	public:
-		inline BookIterator(const Database* db, const Buch* it): db(db), it(it) { }
+		inline BookIterator(const Buch* it): it(it) { }
 		inline BookIterator operator++() { ++it; return *this; }
 		inline BookIterator operator++(int) { BookIterator tmp(*this); ++(*this); return tmp; }
 		inline bool operator==(const BookIterator& other) const { return it == other.it; }
 		inline bool operator!=(const BookIterator& other) const { return it != other.it; }
 		inline const Buch& operator*() const { return *it; }
 	};
-	inline BookIterator begin() const { return BookIterator(this, buchDB.data()); }
-	inline BookIterator end() const { return BookIterator(this, buchDB.data() + buchDB.size()); }
+	inline BookIterator begin() const { return BookIterator(buchDB.data()); }
+	inline BookIterator end() const { return BookIterator(buchDB.data() + buchDB.size()); }
 };

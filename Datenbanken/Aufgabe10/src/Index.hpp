@@ -33,10 +33,15 @@ public:
 	const size_t pos() const {
 		return position;
 	}
+
+	inline bool empty() const {
+		return position == -1;
+	}
 	inline bool used() const {
 		return position != -1;
 	}
 };
+
 
 
 class IndexBucket {
@@ -70,12 +75,14 @@ public:
 };
 
 
+
 class Index {
-static constexpr size_t NUM_BUCKETS = 10000;
+static constexpr size_t NUM_BUCKETS = 36;
 private:
 	std::string column;
-	// std::vector<IndexEntry> index;
+
 	std::array<IndexBucket, NUM_BUCKETS> buckets;
+	// size_t numOccupied; // number of elements in hash table
 
 	static size_t hash(size_t value) {
 		size_t res = 0;
@@ -90,10 +97,10 @@ public:
 	inline Index() {}
 	inline Index(const std::string& column):
 			column(column) {
+
 		if(!Buch::hasColumn(column))
 			throw std::runtime_error("Error: Index: can't create index for invalid column");
-		// if(Buch::columnInfo(column).type != Buch::Column::STRING)
-		// 	throw std::runtime_error("Error: Index: can't create index for non-string column");
+
 		if(Buch::columnInfo(column).type != Buch::Column::INTEGER)
 			throw std::runtime_error("Error: Index: can't create index for non-string column");
 	}
@@ -110,18 +117,9 @@ public:
 
 		while(buckets[index].full())
 			index = (index + 1) % buckets.size();
-		
+
 		buckets[index].insert(row.getInt(column), position);
-
-		// index.push_back(IndexEntry((std::string)row.getString(column), position));
-
-		// std::sort(
-		// 	buckets.begin(),
-		// 	buckets.end(),
-		// 	[](const IndexEntry& a, const IndexEntry& b){
-		// 		return a.value() < b.value();
-		// 	}
-		// );
+		// numOccupied++;
 	}
 
 	inline size_t find(const std::string& key) const { // TODO: implement
@@ -129,54 +127,29 @@ public:
 	}
 
 	inline size_t find(const size_t key) const { // TODO: implement
-		// for(const IndexEntry& ind : buckets)
-		// 	if(ind.value() == key)
-		// 		return ind.pos();
+		if(column.size() == 0)
+			throw std::runtime_error("Error: tried using empty(invalid) Index");
 
 		size_t index = hash(key) % buckets.size();
 
-		while(!buckets[index].hasKey(key))
+		while(!buckets[index].hasKey(key) && buckets[index].full())
 			index = (index + 1) % buckets.size();
-		
+
+		// if(!buckets[index].hasKey(key))
+		// 	return -1;
+
 		return buckets[index].get(key).pos();
-
-		// throw std::runtime_error("ERROR: findBook(): key \"" + std::to_string(key) + "\" not present in Database!");
-
-		// if(column.size() == 0)
-		// 	throw std::runtime_error("Error: tried using empty(invalid) Index");
-		// size_t min = 0; // minimum index (inclusive)
-		// size_t max = index.size() - 1; // maximum index (inclusive)
-
-		// for(;;) {
-
-		// 	const size_t test_i = (max + min) / 2;
-		// 	const IndexEntry& cur = index[test_i];
-
-		// 	// const int comp = strncmp(key, cur.value(), Buch::columns.at(indexed_column).size);
-		// 	// const int comp = strncmp(key.c_str(), cur.value().c_str(), Buch::columnInfo(this->column).size);
-
-		// 	if(cur.value() == key)
-		// 		return cur.pos();
-		// 		// return buchDB[cur.Position];
-
-		// 	if(min >= max) // no index left to test
-		// 		// return -1;
-		// 		throw std::runtime_error("ERROR: findBook(): key \"" + key + "\" not present in Database!");
-
-		// 	if(cur.value() < key)
-		// 		max = test_i;
-		// 	else
-		// 		min = test_i + 1;
-		// }
 	}
 
 	inline const IndexEntry* begin() const {
 		// return index.begin().base();
 		// return index.begin();
+		return nullptr;
 	}
 
 	inline const IndexEntry* end() const {
 		// return index.end().base();
 		// return index.end();
+		return nullptr;
 	}
 };

@@ -1,0 +1,91 @@
+
+
+
+-- Erklärung:
+
+Ohne Index wird linear durch die Datensätze gesucht, während mit Index mittels Hashing, also in O(1) gesucht wird.
+Das Laufzeitverhalten lässt sich am "Plan" erkennen. "Natural" bedeutet ohne Index, "Index (INDEX_NAME)" bedeutet dass ein Index verwendet wird
+
+
+
+-- Ohne Index:
+
+
+Query
+------------------------------------------------
+select * from bench_3 where sp2 = '5673894';
+
+Plan
+------------------------------------------------
+PLAN (BENCH_3 NATURAL)
+
+Query Time
+------------------------------------------------
+Prepare       : 0,00 ms
+Execute       : 219,00 ms
+Avg fetch time: 109,50 ms
+
+Memory
+------------------------------------------------
+Current: 37.543.654
+Max    : 141.145.968
+Buffers: 2.048
+
+Operations
+------------------------------------------------
+Read   : 2.426
+Writes : 1
+Fetches: 526.954
+Marks  : 0
+
+
+Enchanced Info:
++-------------------------------+-----------+-----------+-------------+---------+---------+---------+----------+----------+----------+
+|          Table Name           |  Records  |  Indexed  | Non-Indexed | Updates | Deletes | Inserts | Backouts |  Purges  | Expunges |
+|                               |   Total   |   reads   |    reads    |         |         |         |          |          |          |
++-------------------------------+-----------+-----------+-------------+---------+---------+---------+----------+----------+----------+
+|BENCH_3                        |         0 |         0 |      500000 |       0 |       0 |       0 |        0 |        0 |        0 |
++-------------------------------+-----------+-----------+-------------+---------+---------+---------+----------+----------+----------+
+
+
+
+-- Mit Index:
+
+
+Query
+------------------------------------------------
+select * from bench_3 where sp2 = '5673894';
+
+Plan
+------------------------------------------------
+PLAN (BENCH_3 INDEX (MY_INDEX))
+
+Query Time
+------------------------------------------------
+Prepare       : 0,00 ms
+Execute       : 0,00 ms
+Avg fetch time: 0,00 ms
+
+Memory
+------------------------------------------------
+Current: 37.543.567
+Max    : 141.145.968
+Buffers: 2.048
+
+Operations
+------------------------------------------------
+Read   : 0
+Writes : 0
+Fetches: 12
+Marks  : 0
+
+
+Enchanced Info:
++-------------------------------+-----------+-----------+-------------+---------+---------+---------+----------+----------+----------+
+|          Table Name           |  Records  |  Indexed  | Non-Indexed | Updates | Deletes | Inserts | Backouts |  Purges  | Expunges |
+|                               |   Total   |   reads   |    reads    |         |         |         |          |          |          |
++-------------------------------+-----------+-----------+-------------+---------+---------+---------+----------+----------+----------+
+|BENCH_3                        |         0 |         2 |           0 |       0 |       0 |       0 |        0 |        0 |        0 |
++-------------------------------+-----------+-----------+-------------+---------+---------+---------+----------+----------+----------+
+
+
