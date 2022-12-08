@@ -1,0 +1,50 @@
+2)
+a)
+features aktivieren
+
+b + c)
+control panel
+-> system and securoty
+-> administrative tools
+-> IIS Manager
+
+
+3)
+a)
+TCP:
++ zuverlässig
+  + korrekte reihenfolge
+  + korrektur von packet-loss
+- mehr overhead
+- potenzielle Netzwerkverstopfung
+
+UDP:
++ geringer overhead
++ keine Netzwerkverstopfung
+- keine garantierte reihenfolge
+- Packet Loss
+
+b)
+TCP:
+FTP (20/21), SSH (22), SMTP (25)
+
+UDP:
+DHCP (67/68), TFTP (69), NTP (123)
+
+c)
+Grösse des Eingabepuffers des Empfängers (Wird vom empfänger gesendet)
+
+d)
+client -> server:
+
+syn    ->
+synAck <-
+ack    ->
+
+e)
+sequence-number
+
+g)
+gar nicht.
+
+

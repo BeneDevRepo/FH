@@ -27,7 +27,7 @@ redundancy
 !
 interface Loopback0
  ip address 172.16.224.1 255.255.240.0
- ipv6 address 2001:DB8:D112:3::1/64
+ ipv6 address 2001:DB8:D112:2::1/64
 !
 interface Embedded-Service-Engine0/0
  no ip address
@@ -38,7 +38,8 @@ interface GigabitEthernet0/0
  duplex auto
  speed auto
  ipv6 address FE80::1 link-local
- ipv6 address 2001:DB8:D112:4::1/64
+ ipv6 address 2001:DB8:D112:3::1/64
+ ipv6 address 2001:DB8:D112:3::1/64
 !
 interface GigabitEthernet0/1
  no ip address
@@ -48,7 +49,7 @@ interface GigabitEthernet0/1
 !
 interface Serial0/0/0
  ip address 172.16.254.1 255.255.255.252
- ipv6 address 2001:DB8:D112:8::2/64
+ ipv6 address 2001:DB8:D112:6::2/64
  clock rate 64000
 !
 interface Serial0/0/1
@@ -132,7 +133,7 @@ interface Loopback0
 !
 interface Loopback1
  ip address 172.16.192.1 255.255.224.0
- ipv6 address 2001:DB8:D112:2::1/64
+ ipv6 address 2001:DB8:D112:1::1/64
 !
 interface Loopback2
  no ip address
@@ -147,7 +148,7 @@ interface GigabitEthernet0/0
  duplex auto
  speed auto
  ipv6 address FE80::2 link-local
- ipv6 address 2001:DB8:D112:1::1/64
+ ipv6 address 2001:DB8:D112:0::1/64
 !
 interface GigabitEthernet0/1
  no ip address
@@ -157,11 +158,11 @@ interface GigabitEthernet0/1
 !
 interface Serial0/0/0
  ip address 172.16.254.2 255.255.255.252
- ipv6 address 2001:DB8:D112:8::1/64
+ ipv6 address 2001:DB8:D112:6::1/64
 !
 interface Serial0/0/1
  ip address 172.16.255.1 255.255.255.252
- ipv6 address 2001:DB8:D112:9::1/64
+ ipv6 address 2001:DB8:D112:7::1/64
  clock rate 64000
 !
 ip forward-protocol nd
@@ -174,10 +175,10 @@ ip route 172.16.240.0 255.255.248.0 Serial0/0/0
 ip route 172.16.248.0 255.255.252.0 Serial0/0/1
 ip route 172.16.252.0 255.255.254.0 Serial0/0/1
 !
+ipv6 route 2001:DB8:D112:2::/64 Serial0/0/0
 ipv6 route 2001:DB8:D112:3::/64 Serial0/0/0
-ipv6 route 2001:DB8:D112:4::/64 Serial0/0/0
+ipv6 route 2001:DB8:D112:4::/64 Serial0/0/1
 ipv6 route 2001:DB8:D112:5::/64 Serial0/0/1
-ipv6 route 2001:DB8:D112:6::/64 Serial0/0/1
 !
 control-plane
 !
@@ -241,7 +242,7 @@ interface Loopback0
 !
 interface Loopback2
  ip address 172.16.248.1 255.255.252.0
- ipv6 address 2001:DB8:D112:5::1/64
+ ipv6 address 2001:DB8:D112:4::1/64
 !
 interface Embedded-Service-Engine0/0
  no ip address
@@ -252,7 +253,7 @@ interface GigabitEthernet0/0
  duplex auto
  speed auto
  ipv6 address FE80::3 link-local
- ipv6 address 2001:DB8:D112:6::1/64
+ ipv6 address 2001:DB8:D112:5::1/64
 !
 interface GigabitEthernet0/1
  no ip address
@@ -267,7 +268,7 @@ interface Serial0/0/0
 !
 interface Serial0/0/1
  ip address 172.16.255.2 255.255.255.252
- ipv6 address 2001:DB8:D112:9::2/64
+ ipv6 address 2001:DB8:D112:7::2/64
 !
 ip forward-protocol nd
 !
