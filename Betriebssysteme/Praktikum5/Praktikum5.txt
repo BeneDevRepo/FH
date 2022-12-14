@@ -1,0 +1,128 @@
+ls -l
+: - owner group other
+suid: owner:x => s
+
+symlink: - => l
+ln -s
+
+
+
+chown user folder
+chgrp group folder
+chown user:group folder
+
+chown -r  # recursive
+chgrp -r  # recursive
+
+
+chmod u+r  # add read permission to user
+chmod g+w  # add write permission to group
+chmod o-x  # remove execute permission from others
+chmod a+r  # add read permission to all user
+
+
+beide ausgabekanäle in eine Datei:
+kommando >datei 2>&1
+
+
+
+5.1:
+mkdir man
+cp -R /usr/share/man/* /home/student/man
+
+chmod a+w /home/swtudent/man -R
+
+chown student:users /home/student/man/*
+
+
+5.2:
+
+touch myfile1
+ln -s myfile1 myfile2
+ls -l
+cat > myfile1 # liest input in myfile1 ein (> erstellt / überscreibt myfile1)
+xxxxxxx
+yyyyyyy
+zzzzzzzz
+^C
+ls -l my *
+cat myfile1 # gibt den inhalt von myfile1 aus
+cat myfile2 # gibt den inhalt der datei aus, auf die myfile2 zeigt (also myfile1)
+cat >> myfile2 # liest input in myfile1 ein (>> erstellt / hängt an)
+1111111
+2222222
+33333333
+^C
+ls -l my *
+rm myfile1
+ls -l my *
+
+
+links: mit l gekennzeichnet
+
+Zeile 18:
+Zeile 18 löscht myfile1 (die Datei auf die myfile2 zeigt).
+dadurch wird myfile2 zu einer Verknüpfung auf eine nicht existierende datei,
+was ls -l durch rot-schwarze akzente signalisiert
+
+
+5.3:
+b - block device
+- regular device
+l - link
+s - socket
+c - character device
+p - pipe
+d - directory
+
+ls -l /dev | egrep "^b" | wc -l  => 12
+ls -l /dev | egrep "^-" | wc -l  => 0
+ls -l /dev | egrep "^l" | wc -l  => 8
+ls -l /dev | egrep "^s" | wc -l  => 0
+ls -l /dev | egrep "^c" | wc -l  => 162
+ls -l /dev | egrep "^p" | wc -l  => 0
+ls -l /dev | egrep "^d" | wc -l  => 16
+
+
+ls -l /dev | grep sdc  => brw-rw----
+chmod a+rw /dev/sdc
+
+
+5.4:
+cat /proc/cpuinfo
+model name: AMD Ryzen 5 5500u with Radeon Graphics
+cpu MHz: 2095.997
+cache size: 512KB
+
+cat /proc/filesystems
+ext3, ext2, ext4, squashfs, vfat
+
+cat /proc/meminfo
+MemTotal: 8147264 kB
+
+cat /proc/modules
+btrfs, xor, zstd_compress
+
+cat /proc/partitions
+10483712
+
+cat /proc/version
+5.4.0-126-generic...
+
+
+5.5.4:
+ls -l /dev/sdc
+
+5.5.6:
+du -S -d1 / 2>/dev/null | sort -nr >> report.txt
+
+ls -lsF /usr/bin | grep "*" | sort -nr >> report.txt
+
+cd /
+find -maxdepth 1 -nouser | sort >> report.txt
+
+
+
+
+
+
