@@ -26,10 +26,11 @@ UDP:
 
 b)
 TCP:
-FTP (20/21), SSH (22), SMTP (25)
+FTP (20 DATA/21 COMMAND), SSH (22), SMTP (25)
 
 UDP:
 DHCP (67/68), TFTP (69), NTP (123)
+DHCP 68 -> 67
 
 c)
 Grösse des Eingabepuffers des Empfängers (Wird vom empfänger gesendet)
@@ -39,6 +40,11 @@ client -> server:
 
 syn    ->
 synAck <-
+ack    ->
+
+fin    ->
+ack    <-
+finAck <-
 ack    ->
 
 e)

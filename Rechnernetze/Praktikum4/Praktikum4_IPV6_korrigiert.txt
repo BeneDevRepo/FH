@@ -175,10 +175,8 @@ ip route 172.16.240.0 255.255.248.0 Serial0/0/0
 ip route 172.16.248.0 255.255.252.0 Serial0/0/1
 ip route 172.16.252.0 255.255.254.0 Serial0/0/1
 !
-ipv6 route 2001:DB8:D112:2::/64 Serial0/0/0
-ipv6 route 2001:DB8:D112:3::/64 Serial0/0/0
-ipv6 route 2001:DB8:D112:4::/64 Serial0/0/1
-ipv6 route 2001:DB8:D112:5::/64 Serial0/0/1
+ipv6 route 2001:DB8:D112:0::/62 Serial0/0/0
+ipv6 route 2001:DB8:D112:4::/62 Serial0/0/1
 !
 control-plane
 !
@@ -201,9 +199,6 @@ line vty 0 4
 scheduler allocate 20000 1000
 !
 end
-
-
-
 
 
 

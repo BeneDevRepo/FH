@@ -113,14 +113,6 @@ cat /proc/version
 5.5.4:
 ls -l /dev/sdc
 
-5.5.6:
-du -S -d1 / 2>/dev/null | sort -nr >> report.txt
-
-ls -lsF /usr/bin | grep "*" | sort -nr >> report.txt
-
-cd /
-find -maxdepth 1 -nouser | sort >> report.txt
-
 
 
 
