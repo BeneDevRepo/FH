@@ -1,7 +1,10 @@
 1:
-6 Personen
 Personen: 6
 Probleme: nicht erkannt dass einige Zahlene nicht darstellbar waren, exzessdarstellung, flüchtigkeitsfehler
 
 2:
 Unterstützung bei c++
+
+3:
+Personen: 6
+Probleme: Flüchtigkeitsfehler, bei float abgerundet statt abgeschnitten, ansonsten nahezu perfekt

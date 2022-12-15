@@ -7,14 +7,18 @@ CREATE TABLE Geburtsdatum (
 	GebDat Date
 );
 
-UPDATE Geburtsdatum 
+UPDATE Geburtsdatum
 SET GebDat = CAST ((Tag||'.'||Monat||'.'||Jahr) AS Date);
 
 
-CREATE TRIGGER t_GebOID FOR Geburtsdatum
+CREATE TRIGGER T_Geburtsdatum FOR Geburtsdatum
 	BEFORE INSERT
 AS
-BEGIN
+declare variable zaehler integer = 1;
+begin
+  new.gebdatoid = :zaehler;
+  :zaehler = :zaehler+1;
+end
 
 
 
@@ -25,14 +29,15 @@ DECLARE VARIABLE zaehler integer;
 DECLARE VARIABLE t integer;
 
 begin
-  zaehler = 10000;
+  zaehler = 0;
   FOR select NachnameOID from Nachname into t
   do
     begin
         update nachname
-        set NachnameOID = :zaehler
+        set NachnameOID = 10000 + :zaehler
         where NachnameOID = :t;
         zaehler = zaehler + 1;
+        --zeahler = zeahler % 1000;
   end
 end
 
@@ -95,7 +100,7 @@ end
 
 
 
--- 4
+-- 4:
 
 create procedure Testdaten
 as
@@ -103,37 +108,75 @@ as
 declare variable vname varchar(30);
 declare variable nname varchar(30);
 declare variable ort varchar(50);
-declare variable strassse varchar(50);
+declare variable street varchar(50);
 declare variable gebdat date;
-declare variable zufall integer;
-declare variable zaehler integer;
+declare variable random integer;
+declare variable counter integer;
 
 begin
-counter=0;
-while (counter < 10000)
-do
-begin
-    zufall = (cast(rand() *199 as integer)+1);
-    select vorname1 from vorname where VornameOID = :zufall into :vname;
+	counter=0;
+	while (counter < 10000)
+	do
+	begin
+		random = mod(cast(rand() *199 as integer)+1, (select count(*) from vorname));
+		select vorname1 from vorname where VornameOID = :random into :vname;
 
-    zufall = 10000+(cast(rand() *200 as integer));
-    select nachname1 from nachname where NachnameOID = :zufall into :nname;
+		random = mod(cast(rand() *200 as integer), (select count(*) from nachname));
+		select nachname1 from nachname where NachnameOID = :random into :nname;
 
-    zufall = (cast(rand() *200 as integer)*2);
-    select ort1 from Wohnort where OrtOID = :zufall into :ort;
+		random = mod(cast(rand() *200 as integer)+1, (select count(*) from wohnort));
+		select ort1 from Wohnort where OrtOID = :random into :ort;
 
-    zufall = (cast(rand() *200 as integer)+1);
-    select strasse1 from Strasse where StrasseOID = :zufall into :strassse;
+		random = mod(cast(rand() *200 as integer)+1, (select count(*) from strasse));
+		select strasse1 from Strasse where StrasseOID = :random into :street;
 
-    zufall = (cast(rand() *100 as integer)+1);
-    select GebDat from Geburtsdatum where GebDatOID = :zufall into :gebdat;
+		random = mod(cast(rand() *100 as integer)+1, (select count(*) from geburtsdatum));
+		select GebDat from Geburtsdatum where GebDatOID = :random into :gebdat;
 
-    insert into Person (vorname,Nachname,Orte,Strassen,Geburtsdaten) values
-    (:vname, :nname, :ort, :strassse, :gebdat);
+		insert into Person (personoid, vorname,Nachname,Orte,Strassen,Geburtsdaten) values
+		(:counter, :vname, :nname, :ort, :street, :gebdat);
 
-    counter = counter + 1;
+		counter = counter + 1;
     end
 end
+
+/* create procedure Testdaten
+as
+
+declare variable vname varchar(30);
+declare variable nname varchar(30);
+declare variable ort varchar(50);
+declare variable street varchar(50);
+declare variable gebdat date;
+declare variable random integer;
+declare variable counter integer;
+
+begin
+	counter=0;
+	while (counter < 10000)
+	do
+	begin
+		random = (cast(rand() *199 as integer)+1);
+		select vorname1 from vorname where VornameOID = :random into :vname;
+
+		random = 10000+(cast(rand() *200 as integer));
+		select nachname1 from nachname where NachnameOID = :random into :nname;
+
+		random = (cast(rand() *200 as integer)*2);
+		select ort1 from Wohnort where OrtOID = :random into :ort;
+
+		random = (cast(rand() *200 as integer)+1);
+		select strasse1 from Strasse where StrasseOID = :random into :street;
+
+		random = (cast(rand() *100 as integer)+1);
+		select GebDat from Geburtsdatum where GebDatOID = :random into :gebdat;
+
+		insert into Person (vorname,Nachname,Orte,Strassen,Geburtsdaten) values
+		(:vname, :nname, :ort, :street, :gebdat);
+
+		counter = counter + 1;
+    end
+end */
 
 
 
