@@ -1,0 +1,8 @@
+{
+	"java.project.referencedLibraries": [
+		"lib/**/*.jar",
+		"jaybird-full-4.0.8.java11.jar",
+		"connector-api-1.5.jar",
+		"jna-5.5.0.jar"
+	]
+}
