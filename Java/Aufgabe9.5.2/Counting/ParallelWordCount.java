@@ -15,7 +15,6 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -37,7 +36,6 @@ public class ParallelWordCount {
 		if(filename == null)
 			throw new RuntimeException("Error: ParallelWordCount(): Null is not a valid filename");
 
-		// {
 		File file = new File(filename); // Datei-Objekt erstellen
 
 		// Prüfen ob die Datei existiert:
@@ -51,21 +49,18 @@ public class ParallelWordCount {
 		// Prüfen ob die Datei lesbar ist:
 		if(!file.canRead())
 			throw new RuntimeException("Error: ParallelWordCount(): file at path <" + filename + "> is not readable.");
-		// }
 
 		// ExecutorService zum Verwalten der Zeilen-Threads erstellen:
 		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
-		// ThreadPoolExecutor a = new ThreadPoolExecutor(8, 8, 0, null, null);
 		
+		// Liste für LineWordCount-Objekte erstellen:
 		ArrayList<LineWordCount> runnables = new ArrayList<>();
-		// runnables.
 		
-		// Datei zeile für Zeile einlesen und verarbeiten:
-		// try (BufferedReader f = new BufferedReader(new FileReader(filename, StandardCharsets.UTF_8))) {
+		// Datei zeile für Zeile einlesen und Wörter zählen:
 		try (BufferedReader f = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
 			String line = null; // aktuelle Zeile
-			List<String> lines = new ArrayList<>(); // liste an Zeilen für den Nächsten Thread
-			
+			List<String> lines = new ArrayList<>(); // liste an Zeilen für das nächste LineWordCount-Objekt
+
 			// LineWordCount-Objekte erzeugen:
 			for (int lineIndex = 0; (line = f.readLine()) != null; ) {
 				lines.add(line);
@@ -73,14 +68,12 @@ public class ParallelWordCount {
 				lineIndex++;
 				if(lineIndex == numLinesPerThread) {
 					runnables.add(new LineWordCount(lines)); // Counter-Objekt erstellen unnd speichern
-					// LineWordCount lwc = new LineWordCount(lines); // Runnable für aktuelle Zeile erstellen
-					// executor.execute(lwc); // runnable in beliebigem thread des executorService ausführen
-					
+
 					lines = new ArrayList<>();
 					lineIndex = 0;
 				}
 			}
-			runnables.add(new LineWordCount(lines)); // Counter-Objekt erstellen unnd speichern
+			runnables.add(new LineWordCount(lines)); // Counter-Objekt für übrige Zeilen erstellen unnd speichern
 
 			// LineWordCount-Objekte ausführen:
 			for(Runnable runnable : runnables)
@@ -140,13 +133,7 @@ public class ParallelWordCount {
 		private void processWord(String word) {
 			counts.putIfAbsent(word, 0); // Sicherstellen dass für <word> ein Counter existiert
 
-			// // Compare-exchange-schleife zum Erhöhen des Zählers:
-			// boolean done = false;
-			// while(!done) {
-			// 	Integer prevCount = counts.get(word);
-			// 	done = counts.replace(word, prevCount, prevCount + 1);
-			// }
-			counts.put(word, counts.get(word) + 1);
+			counts.put(word, counts.get(word) + 1); // Zähler erhöhen
 		}
 
 		/**
@@ -154,7 +141,6 @@ public class ParallelWordCount {
 		 * @param line Die zu verarbeitende Zeile
 		 */
 		private void processLine(String line) {
-			// String[] words = line.split("[\\p{Space}\\p{Punct}]");
 			String[] words = line.split("[\\p{Space}\\p{Punct}\\p{Cntrl}]");
 			for(String word : words) {
 				// Leere Wörter überspringen:

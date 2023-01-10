@@ -55,7 +55,6 @@ public class WordCount {
 		if(filename == null)
 			throw new RuntimeException("Error: WordCount(): Null is not a valid filename");
 
-		// {
 		File file = new File(filename); // Datei-Objekt erstellen
 
 		// Prüfen ob die Datei existiert:
@@ -69,7 +68,6 @@ public class WordCount {
 		// Prüfen ob die Datei lesbar ist:
 		if(!file.canRead())
 			throw new RuntimeException("Error: WordCount(): file at path <" + filename + "> is not readable.");
-		// }
 
 		// Datei zeile für Zeile einlesen:
 		// try (BufferedReader f = new BufferedReader(new FileReader(filename, StandardCharsets.UTF_8))) {
