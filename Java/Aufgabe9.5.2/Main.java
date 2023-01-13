@@ -95,7 +95,7 @@ public class Main {
 			// Falls irgendein Test schiefgelaufen wäre und eine Exception geworfen worden wäre, würde dieser Punkt nicht erreicht werden:
 			System.out.println("All tests passed Successfully");
 		} catch(Exception e) {
-			System.out.println("Tests failed. Exception:");
+			System.err.println("Tests failed. Exception:");
 			e.printStackTrace(System.err);
 		}
 	}

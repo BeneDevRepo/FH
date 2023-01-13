@@ -21,8 +21,8 @@ import java.util.concurrent.TimeUnit;
  * Eine Klasse zum Zählen von Wörtern in einer Text-Datei, mit multi-threading
  */
 public class ParallelWordCount {
-	private ConcurrentHashMap<String, Integer> counts;
-	private Vector<Map.Entry<String, Integer>> vectorCounts;
+	private ConcurrentHashMap<String, Integer> counts; // HashMap zum Speichern der Ergebnisse
+	private Vector<Map.Entry<String, Integer>> vectorCounts; // zum zwischenspeichern der einzelnen Thread-Ergebnisse
 
 	/**
 	 * Erstellt ein WordCount Objekt, liest die Datei ein und zählt die Vorkommen aller Wörter
@@ -155,6 +155,10 @@ public class ParallelWordCount {
 			}
 		}
 
+		/**
+		 * gibt die Ergebnisse des Threads zurück
+		 * @return Erbegnismenge aus Wörtern und ihren jeweiligen Anzahlen
+		 */
 		public HashMap<String, Integer> getCounts() {
 			return counts;
 		}

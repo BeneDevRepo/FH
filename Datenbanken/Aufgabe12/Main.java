@@ -1,7 +1,6 @@
 import java.sql.*;
 
-// import java.util.Properties;
-// import javax.sql.*;
+import java.util.Scanner;
 
 
 public class Main {
@@ -11,14 +10,6 @@ public class Main {
     final static String dbFile = "C:/Users/Bened/Desktop/FH/Datenbanken/Aufgabe12/Aufgabe12.FDB"; // Laptop
     // final static String dbFile = "A:/_Info_Projects/FH/Datenbanken/Aufgabe12/Aufgabe12.FDB"; // PC
 
-
-    public static void main(String[] args) {
-        try {
-            run();
-        } catch(Exception e) {
-            System.out.println("Exception thrown: " + e);
-        }
-    }
 
 	public static void printResult(ResultSet res) throws SQLException {
 		ResultSetMetaData resMeta = res.getMetaData();
@@ -88,30 +79,110 @@ public class Main {
 		conn.commit();
 	}
 
-    public static void run() throws SQLException, ClassNotFoundException {
+	public static int readID(Scanner cin) {
+		int id = -1;
+		for(;;) {
+			System.out.print("Please enter id: ");
+			if(cin.hasNextInt()) {
+				id = cin.nextInt();
+				cin.nextLine(); // clear input
+				break;
+			}
+			
+			System.out.println("Could not parse integer, please try again...");
+			cin.nextLine(); // clear input
+		}
+		return id;
+	}
+
+	public static void main(String[] args) {
+        try {
+            run();
+        } catch(Exception e) {
+            System.out.println("\n\nException thrown: " + e);
+        }
+    }
+
+    public static void run() throws Exception {
         Class.forName("org.firebirdsql.jdbc.FBDriver");
         Connection conn = DriverManager.getConnection("jdbc:firebirdsql://localhost:3050/" + dbFile, userName, password);
-
-        System.out.println("Connected to database");
-
-		boolean autoComm = conn.getAutoCommit();
-		conn.setAutoCommit(false);
-
-		System.out.print("\n\n\n");
-
-		// printQueryResult(conn, "SELECT * FROM Buch;");
-		// printQueryResult(conn, "SELECT * FROM Buch WHERE titel = 'Herr der Ringe 1';");
-
-
-
-		// executeStatement(conn, "insert into Buch values(3, 'TestBuch', 'Max Mustermann');");
 		
-		printQueryResult(conn, "SELECT * FROM Buch;");
+		final boolean autoComm = conn.getAutoCommit();
+		conn.setAutoCommit(false);
+		
+        System.out.println("\n\nConnected to database");
 
-		// executeStatement(conn, "UPDATE Buch SET Autor = 'Angela Merkel' WHERE Autor = 'Max Mustermann';");
-		executeStatement(conn, "UPDATE Buch SET Autor = 'Max Mustermann' WHERE Autor = 'Angela Merkel';");
 
-		printQueryResult(conn, "SELECT * FROM Buch;");
+		System.out.println("Type help for more information...");
+		
+
+
+		Scanner cin = new Scanner(System.in);  // Create a Scanner object
+
+		boolean done = false;
+		while(!done) {
+			System.out.println("Enter Command: ");
+			System.out.print(" > ");
+
+			String command = cin.nextLine();  // Read user input
+			// System.out.println("Command: " + command);  // Output user input
+			int id = -1;
+			switch(command) {
+				case "help":
+					System.out.println(" Available Commands:");
+					System.out.println(" - exit - disconnects database and stops program");
+					System.out.println(" - print - prints all datasets");
+					System.out.println(" - show\\n <id> prints specified dataset");
+					System.out.println(" - rm\\n <id> removes specified dataset");
+					System.out.println(" - set\\n <id> overwrites specified dataset");
+
+					break;
+				
+				case "exit":
+					done = true;
+					break;
+				
+				case "print":
+					printQueryResult(conn, "SELECT * FROM Buch;");
+					break;
+					
+				case "show":
+					id = readID(cin);
+					printQueryResult(conn, "SELECT * FROM Buch WHERE BuchOID = " + id + ";");
+					break;
+					
+				case "rm":
+					id = readID(cin);
+					executeStatement(conn, "DELETE FROM Buch WHERE BuchOID = " + id + ";");
+					break;
+					
+				case "set":
+					id = readID(cin);
+					System.out.print("Please Enter new Title: ");
+					String newTitle = cin.nextLine();
+					System.out.print("Please Enter new Author: ");
+					String newAuthor = cin.nextLine();
+
+					// primitiv (erlaubt SQL-Injection):
+					// executeStatement(conn, "UPDATE Buch SET Titel = '" + newTitle + "', Autor = '" + newAuthor + "' WHERE BuchOID = " + id + ";");
+
+					// Korrekter (keine SQL-Injections):
+					PreparedStatement updteStatement = conn.prepareStatement("UPDATE Buch SET Titel = ?, Autor = ? WHERE BuchOID = ? ;");
+					updteStatement.setString(1, newTitle);
+					updteStatement.setString(2, newAuthor);
+					updteStatement.setInt(3, id);
+					updteStatement.executeUpdate();
+					conn.commit();
+					break;
+					
+				default:
+					System.out.println("Unknown command. Type help for more information...");
+					break;
+
+			}
+		}
+
+		cin.close();
 
 		conn.setAutoCommit(autoComm);
 		conn.close();
