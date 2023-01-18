@@ -1,0 +1,420 @@
+Im folgenden werde ich die Ergebnisse des Benchmarks an 2 Beispielmessungen diskutieren:
+
+
+Messung 1 (Aufgabe 1):
+
+   Threads |   L/Thread |       Time
+         1 |          1 |         83ms
+         1 |         10 |         89ms
+         1 |         20 |         23ms
+         1 |         30 |         29ms
+         1 |         40 |         40ms
+         1 |         50 |         33ms
+         1 |         60 |         24ms
+         1 |         70 |         17ms
+         1 |         80 |         17ms
+         1 |         90 |         19ms
+         1 |        100 |         17ms
+         2 |          1 |         14ms
+         2 |         10 |         24ms
+         2 |         20 |         21ms
+         2 |         30 |         12ms
+         2 |         40 |          9ms
+         2 |         50 |         13ms
+         2 |         60 |         12ms
+         2 |         70 |          7ms
+         2 |         80 |          9ms
+         2 |         90 |          8ms
+         2 |        100 |          7ms
+         3 |          1 |          7ms
+         3 |         10 |          8ms
+         3 |         20 |          5ms
+         3 |         30 |          4ms
+         3 |         40 |          5ms
+         3 |         50 |          4ms
+         3 |         60 |          4ms
+         3 |         70 |          4ms
+         3 |         80 |          4ms
+         3 |         90 |          6ms
+         3 |        100 |          5ms
+         4 |          1 |          4ms
+         4 |         10 |          5ms
+         4 |         20 |          4ms
+         4 |         30 |          4ms
+         4 |         40 |          5ms
+         4 |         50 |          4ms
+         4 |         60 |          4ms
+         4 |         70 |          3ms
+         4 |         80 |          6ms
+         4 |         90 |          4ms
+         4 |        100 |          5ms
+         5 |          1 |         11ms
+         5 |         10 |          7ms
+         5 |         20 |          7ms
+         5 |         30 |          9ms
+         5 |         40 |         13ms
+         5 |         50 |          6ms
+         5 |         60 |          7ms
+         5 |         70 |          7ms
+         5 |         80 |          6ms
+         5 |         90 |          5ms
+         5 |        100 |          5ms
+         6 |          1 |          3ms
+         6 |         10 |          4ms
+         6 |         20 |          4ms
+         6 |         30 |          4ms
+         6 |         40 |          4ms
+         6 |         50 |          4ms
+         6 |         60 |          3ms
+         6 |         70 |          4ms
+         6 |         80 |          5ms
+         6 |         90 |          6ms
+         6 |        100 |          6ms
+         7 |          1 |          4ms
+         7 |         10 |          7ms
+         7 |         20 |          7ms
+         7 |         30 |          5ms
+         7 |         40 |          7ms
+         7 |         50 |          4ms
+         7 |         60 |          4ms
+         7 |         70 |          3ms
+         7 |         80 |          3ms
+         7 |         90 |          5ms
+         7 |        100 |          4ms
+         8 |          1 |          4ms
+         8 |         10 |          4ms
+         8 |         20 |          3ms
+         8 |         30 |          4ms
+         8 |         40 |          4ms
+         8 |         50 |          3ms
+         8 |         60 |          3ms
+         8 |         70 |          3ms
+         8 |         80 |          3ms
+         8 |         90 |          4ms
+         8 |        100 |          3ms
+         9 |          1 |          5ms
+         9 |         10 |          3ms
+         9 |         20 |          3ms
+         9 |         30 |          4ms
+         9 |         40 |          4ms
+         9 |         50 |          3ms
+         9 |         60 |          4ms
+         9 |         70 |          3ms
+         9 |         80 |          3ms
+         9 |         90 |          4ms
+         9 |        100 |          3ms
+        10 |          1 |          4ms
+        10 |         10 |          3ms
+        10 |         20 |          5ms
+        10 |         30 |          4ms
+        10 |         40 |          4ms
+        10 |         50 |          4ms
+        10 |         60 |          6ms
+        10 |         70 |          5ms
+        10 |         80 |          3ms
+        10 |         90 |          4ms
+        10 |        100 |          3ms
+        11 |          1 |          3ms
+        11 |         10 |          3ms
+        11 |         20 |          3ms
+        11 |         30 |          2ms
+        11 |         40 |          2ms
+        11 |         50 |          1ms
+        11 |         60 |          2ms
+        11 |         70 |          2ms
+        11 |         80 |          2ms
+        11 |         90 |          1ms
+        11 |        100 |          2ms
+        12 |          1 |          2ms
+        12 |         10 |          2ms
+        12 |         20 |          3ms
+        12 |         30 |          3ms
+        12 |         40 |          3ms
+        12 |         50 |          3ms
+        12 |         60 |          3ms
+        12 |         70 |          4ms
+        12 |         80 |          4ms
+        12 |         90 |          3ms
+        12 |        100 |          3ms
+        13 |          1 |          3ms
+        13 |         10 |          4ms
+        13 |         20 |          3ms
+        13 |         30 |          3ms
+        13 |         40 |          3ms
+        13 |         50 |          2ms
+        13 |         60 |          1ms
+        13 |         70 |          2ms
+        13 |         80 |          3ms
+        13 |         90 |          2ms
+        13 |        100 |          1ms
+        14 |          1 |          4ms
+        14 |         10 |          3ms
+        14 |         20 |          3ms
+        14 |         30 |          4ms
+        14 |         40 |          3ms
+        14 |         50 |          3ms
+        14 |         60 |          3ms
+        14 |         70 |          3ms
+        14 |         80 |          4ms
+        14 |         90 |          4ms
+        14 |        100 |          3ms
+        15 |          1 |          3ms
+        15 |         10 |          4ms
+        15 |         20 |          4ms
+        15 |         30 |          5ms
+        15 |         40 |          4ms
+        15 |         50 |          4ms
+        15 |         60 |          2ms
+        15 |         70 |          2ms
+        15 |         80 |          2ms
+        15 |         90 |          6ms
+        15 |        100 |          3ms
+        16 |          1 |          2ms
+        16 |         10 |          1ms
+        16 |         20 |          2ms
+        16 |         30 |          2ms
+        16 |         40 |          3ms
+        16 |         50 |          2ms
+        16 |         60 |          2ms
+        16 |         70 |          1ms
+        16 |         80 |          2ms
+        16 |         90 |          1ms
+        16 |        100 |          2ms
+
+
+
+Messung 2 (Aufgabe 2):
+   Threads |   L/Thread |       Time
+         1 |          1 |         97ms
+         1 |         10 |         26ms
+         1 |         20 |         25ms
+         1 |         30 |         14ms
+         1 |         40 |         16ms
+         1 |         50 |         13ms
+         1 |         60 |         14ms
+         1 |         70 |         28ms
+         1 |         80 |         28ms
+         1 |         90 |         25ms
+         1 |        100 |         25ms
+         2 |          1 |         20ms
+         2 |         10 |         18ms
+         2 |         20 |          8ms
+         2 |         30 |          8ms
+         2 |         40 |          9ms
+         2 |         50 |          9ms
+         2 |         60 |          8ms
+         2 |         70 |          8ms
+         2 |         80 |          8ms
+         2 |         90 |          7ms
+         2 |        100 |          8ms
+         3 |          1 |          9ms
+         3 |         10 |          7ms
+         3 |         20 |          7ms
+         3 |         30 |          6ms
+         3 |         40 |          6ms
+         3 |         50 |          6ms
+         3 |         60 |          6ms
+         3 |         70 |          5ms
+         3 |         80 |          6ms
+         3 |         90 |          6ms
+         3 |        100 |          5ms
+         4 |          1 |          7ms
+         4 |         10 |          6ms
+         4 |         20 |          6ms
+         4 |         30 |          6ms
+         4 |         40 |          5ms
+         4 |         50 |          6ms
+         4 |         60 |          5ms
+         4 |         70 |          6ms
+         4 |         80 |          7ms
+         4 |         90 |          7ms
+         4 |        100 |          5ms
+         5 |          1 |          9ms
+         5 |         10 |          6ms
+         5 |         20 |          5ms
+         5 |         30 |          5ms
+         5 |         40 |          5ms
+         5 |         50 |          7ms
+         5 |         60 |          5ms
+         5 |         70 |          5ms
+         5 |         80 |          5ms
+         5 |         90 |          6ms
+         5 |        100 |          4ms
+         6 |          1 |          9ms
+         6 |         10 |          6ms
+         6 |         20 |          5ms
+         6 |         30 |          5ms
+         6 |         40 |          8ms
+         6 |         50 |          5ms
+         6 |         60 |          7ms
+         6 |         70 |          5ms
+         6 |         80 |          4ms
+         6 |         90 |          5ms
+         6 |        100 |          4ms
+         7 |          1 |          7ms
+         7 |         10 |          7ms
+         7 |         20 |          6ms
+         7 |         30 |          4ms
+         7 |         40 |          5ms
+         7 |         50 |          4ms
+         7 |         60 |          5ms
+         7 |         70 |          5ms
+         7 |         80 |          4ms
+         7 |         90 |          5ms
+         7 |        100 |          5ms
+         8 |          1 |          7ms
+         8 |         10 |          4ms
+         8 |         20 |          4ms
+         8 |         30 |          7ms
+         8 |         40 |          5ms
+         8 |         50 |          5ms
+         8 |         60 |          5ms
+         8 |         70 |          5ms
+         8 |         80 |          4ms
+         8 |         90 |          4ms
+         8 |        100 |          5ms
+         9 |          1 |          7ms
+         9 |         10 |          5ms
+         9 |         20 |          4ms
+         9 |         30 |          5ms
+         9 |         40 |          6ms
+         9 |         50 |          4ms
+         9 |         60 |          5ms
+         9 |         70 |          4ms
+         9 |         80 |          4ms
+         9 |         90 |          4ms
+         9 |        100 |          3ms
+        10 |          1 |          8ms
+        10 |         10 |          6ms
+        10 |         20 |          4ms
+        10 |         30 |          4ms
+        10 |         40 |          4ms
+        10 |         50 |          4ms
+        10 |         60 |          4ms
+        10 |         70 |          4ms
+        10 |         80 |          4ms
+        10 |         90 |          4ms
+        10 |        100 |          4ms
+        11 |          1 |          7ms
+        11 |         10 |          4ms
+        11 |         20 |          6ms
+        11 |         30 |          4ms
+        11 |         40 |          5ms
+        11 |         50 |          4ms
+        11 |         60 |          4ms
+        11 |         70 |          4ms
+        11 |         80 |          4ms
+        11 |         90 |          4ms
+        11 |        100 |          4ms
+        12 |          1 |          7ms
+        12 |         10 |          4ms
+        12 |         20 |          5ms
+        12 |         30 |          4ms
+        12 |         40 |          4ms
+        12 |         50 |          4ms
+        12 |         60 |          4ms
+        12 |         70 |          4ms
+        12 |         80 |          4ms
+        12 |         90 |          4ms
+        12 |        100 |          4ms
+        13 |          1 |          7ms
+        13 |         10 |          6ms
+        13 |         20 |          6ms
+        13 |         30 |          4ms
+        13 |         40 |          5ms
+        13 |         50 |          5ms
+        13 |         60 |          5ms
+        13 |         70 |          5ms
+        13 |         80 |          5ms
+        13 |         90 |          4ms
+        13 |        100 |          5ms
+        14 |          1 |          6ms
+        14 |         10 |          5ms
+        14 |         20 |          4ms
+        14 |         30 |          4ms
+        14 |         40 |          4ms
+        14 |         50 |          4ms
+        14 |         60 |          5ms
+        14 |         70 |          4ms
+        14 |         80 |          4ms
+        14 |         90 |          4ms
+        14 |        100 |          4ms
+        15 |          1 |          7ms
+        15 |         10 |          5ms
+        15 |         20 |          5ms
+        15 |         30 |          5ms
+        15 |         40 |          4ms
+        15 |         50 |          5ms
+        15 |         60 |          5ms
+        15 |         70 |          4ms
+        15 |         80 |          4ms
+        15 |         90 |          4ms
+        15 |        100 |          4ms
+        16 |          1 |          7ms
+        16 |         10 |          6ms
+        16 |         20 |          4ms
+        16 |         30 |          5ms
+        16 |         40 |          4ms
+        16 |         50 |          4ms
+        16 |         60 |          4ms
+        16 |         70 |          5ms
+        16 |         80 |          4ms
+        16 |         90 |          4ms
+        16 |        100 |          4ms
+		
+		
+
+
+Ohne die Daten in irgendeiner Art und weise zu verstehen lassen sich auf den ersten Blick einige offensichtliche Tendenzen erkennen:
+
+1. Die benötigte Zeit, um alle Zeilen zu zählen, wird kleiner, umso mehr Threads genutzt werden.
+Dieser Effekt ist zumindest im vergleich zwischen 1, 2 und 3 Threads kaum zu übersehen.
+
+2. Die benötigte Zeit wird kleiner, umso mehr Zeilen pro Thread verwendet werden.
+Der Effekt ist stets sichtbar, unabhämgig davon wie viele threads verwendet werden.
+
+3. Aufgabe 2 braucht insgesamt stets etwas länger als Aufgabe 1,
+die Verhältnisse zwischen den Laufzeiten innerhalb der Aufgaben scheinen aber in etwa gleich zu sein.
+
+Alle 3 Effekte sind zu erwarten und lassen sich leicht erklären:
+
+Moderne Computer haben in der Regel mehrere Prozessor-Kerne (im Falle dieser Messung 8) und können somit mehrere Aufgaben gleichzeitig ausführen ("=Multithreading").
+Wenn das gesamte Programm auf einem einzigen Thread (bzw. Kern) ausgeführt wird, nutzt es also nur einen Bruchteil der theoretisch zur Verfügung stehenden Rechenleistung (hier z.B. etwa 12%).
+Teilt man die Rechenlast also auf mehrere Threads auf, dann kann man mehr von der ohnehin verfügbaren Rechenleistung gleichzeitig nutzen und das Programm somit enorm beschleunigen.
+Unter optimalbedingungen würde ein Programm mit genauso vielen Threads wie Kernen im Prozessor also am effizientesten laufen. In der Realität läuft auf einem normalem Desktop-PC allerdings
+für gewöhnlich auch ein Betriebssystem (hier Windows 10) und innerhalb des Betriebssystems können natürlich auch noch andere Programme laufen, die ebenfalls einen teil der Gesamtressourcen nutzen.
+Somit ist also spätestens im Falle von mehr Threads als Prozessor-Kernen keinerlei Leistungssteigerung zu erwarten,
+aufgrund des Betriebssystems und anderen parallel laufenden Programmen stagniert die Leistung allerdings meist schon vorher.
+Da z.B. kontext-wechsel beim Aufteilen eines Prozessorkerns auf mehrere Threads und auch das Erstellen von LineWordCount-Objekten Rechenzeit kosten,
+ist grundsätzlich auch mit schlechterer Leistung zu rechnen, wenn viel zu viele Threads genutzt werden,
+dieser Effekt ist in diesem Beispiel allerdings nicht sichtbar (vermutlich weil der Overhead bei gerade einmal 16 threads noch um ein vielfaches kleiner ist als das eigentliche Zählen von Wörtern,
+und so im Rauschen von leichten Leistungsschwankungen untergeht).
+
+Der Grund dafür, dass die Benötigte Zeit kleiner wird umso mehr Zeilen von je einem LineWordCount-Objekt verarbeitet werden, ist ähnlich simpel:
+Das Erzeugen bzw. Allokieren von LineWordCount-Objekten kostet Rechenleistung (Zeit), ebenso wie das Umschalten eines einzelnen Threads
+zwischen unterschiedlichen LineWordCount Objekten. Dieser Overhead wird minimiert, wenn jeder Thread möglichst wenige LineWordCount-Objekte (und somit mehr Zeilen 
+pro LineWordCount) abarbeiten muss. Das ist zumindest dann der Fall, wenn die Gesamtarbeit relativ gleichmässig auf die einzelnen LineWordCount-Objekte verteilt ist.
+Sollte das nicht der Fall sein, z.B. wenn einzelne Bereiche der Eingabedatei deutlich längere Zeilen haben als andere Bereiche, dann kann eine Verteilung der Zeilen auf 
+mehr LineWordCount-Objekte dazu beitragen, dass sich der Arbeitsaufwand automatisch optimaler verteilt (da die Threads, die die kürzeren Arbeitspakete abarbeiten, 
+schnell fertig werden und direkt weitere Arbeit übernehmen, anstatt nur auf die anderen Threads zu warten. Es ist dementsprechend also ratsam, so viele Zeilen wie möglich mit einem einzelnen 
+LineWordCount-Objekt abzuarbeiten, um unnötigen Overhead zu vermeiden, dabei aber stets darauf zu achten, dass die Anzahl an lineWordCount-Objekten gross genug ist, um die Rechenarbeit 
+gleichmässig aufzuteilen. Es ist besonders auch zu beachten, dass die Anzahl an LineWordCount-Objekten möglichst nicht kleiner sein sollte als die Anzahl an threads, da sonst ganze Threads leer ausgehen 
+würden, was offensichtlich keine effiziente Nutzung der zur Verfügung stehenden Leistung wäre.
+
+Der Grund dafür, dass Aufgabe 2 lamgsamer ist als Aufgabe 1, ist im Grunde recht simpel: Das zusätzliche Allokieren von Speicher und der zusätzliche Kopieraufwand sind zusatz-Arbeit im Vergleich zu Aufgabe 1,
+und zeigen sich dementsprechend auch in der Laufzeit des Algorithmus. Was weniger offensichtlich ist ist, dass dieses Ergebnis nicht immer auftreten muss.
+Während Aufgabe 2 unter Optimalbedingungen stets langsamer ist als Aufgabe 1, hat Aufgabe 2 den grossen Vorteil, grösstenteils deterministisch zu sein.
+Da sich die Threads in Aufgabe 2 keinerlei Ressourcen teilen und völlig isoliert voneinander laufen, ist es bei korrekter Implementierung nich möglich, dass sich die unterschiedlichen
+Threads gegenseitig stören. Somit kann davon ausgegangen wenrden, dass das Programm aus Aufgabe 2 unter gleichen Äusseren Bedingungen stets in etwa gleich lange laufen wird.
+
+Ganz anders sieht dies bei Aufgabe 1 aus: Während sich die Threads auf den meisten herkömmlichen PCs bzw. Laptops NORMALERWEISE so selten in die quere kommen,
+dass Aufgabe 1 schneller läuft als Aufgabe 2, ist dies alles andere als garantiert. Da in Aufgabe 1 alle Threads auf eine zentrale Map zugreifen, kann es pasieren,
+dass alle Threads gleichzeitig versuchen, ihr Ergebnis in die in die Map zu schreiben. In einer derartigen Situation würde nur ein einziger Zugriff tatsächlich Glücken,
+alle anderen Threads müssten ihre jeweilige CAS (Compare-And-Set) -Schleife ein weiteres mal durchlaufen. Da eine derartige Situation aber extrem unwahrscheinlich 
+(und in diesem Falle auch nicht schlimm) ist, ist es in den meisten realistischen Fällen nicht notwendig, derartige konflikte zwischen atomaren Zugriffen explizit zu verhindern.
+
+
+
+
+
+

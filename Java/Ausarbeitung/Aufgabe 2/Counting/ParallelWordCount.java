@@ -1,17 +1,17 @@
 package Counting;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.FileReader;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -57,7 +57,7 @@ public class ParallelWordCount {
 		ArrayList<LineWordCount> runnables = new ArrayList<>();
 		
 		// Datei zeile für Zeile einlesen und Wörter zählen:
-		try (BufferedReader f = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
+		try (BufferedReader f = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) { // Try-with-resources, um datei im Fehlerfall automatisch zu shcliessen
 			String line = null; // aktuelle Zeile
 			List<String> lines = new ArrayList<>(); // liste an Zeilen für das nächste LineWordCount-Objekt
 
@@ -65,9 +65,9 @@ public class ParallelWordCount {
 			for (int lineIndex = 0; (line = f.readLine()) != null; ) {
 				lines.add(line);
 				
-				lineIndex++;
-				if(lineIndex == numLinesPerThread) {
-					runnables.add(new LineWordCount(lines)); // Counter-Objekt erstellen unnd speichern
+				lineIndex++; // Zeilen durchzählen
+				if(lineIndex == numLinesPerThread) { // Alle <numLinesPerThread> Zeilen ein LineWordCount-Objekt erstellen
+					runnables.add(new LineWordCount(lines)); // Counter-Objekt erstellen und speichern
 
 					lines = new ArrayList<>();
 					lineIndex = 0;

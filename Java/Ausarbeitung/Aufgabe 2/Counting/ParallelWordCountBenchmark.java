@@ -18,18 +18,24 @@ public class ParallelWordCountBenchmark {
 	 * @throws InterruptedException
 	 */
 	public static List<Result> benchmark(String filename, List<Integer> numThreads, List<Integer> numLinesPerThread) throws IOException, InterruptedException {
-		ArrayList<Result> res = new ArrayList<>();
+		ArrayList<Result> res = new ArrayList<>(); // Liste aus Resultaten zum Speichern der Messungen vorbereiten
+
+		// Alle zu testenden Thread-Anzahlen durchgehen:
 		for(Integer nThreads : numThreads) {
+
+			// Alle zu testenden Werte für Zeilen pro Thread durchgehen:
 			for(Integer nLines : numLinesPerThread) {
 				Result currentRes = new Result(); // Datenkapsel für aktuelle Messung
 
+				// Parameter der aktuellen Messung speichern:
 				currentRes.numThreads = nThreads;
 				currentRes.numLinesPerThread = nLines;
-				currentRes.tMillis = (int)(System.nanoTime() / 1000); // Startzeit speichern
+
+				currentRes.tMillis = (int)(System.nanoTime() / 1000000); // Startzeit speichern (in millisekunden)
 
 				new ParallelWordCount(filename, nLines, nThreads); // Zeilen zählen
 
-				currentRes.tMillis = (int)(System.nanoTime() / 1000) - currentRes.tMillis; // Endzeit einlesen + differenz berechnen
+				currentRes.tMillis = (int)(System.nanoTime() / 1000000) - currentRes.tMillis; // Endzeit einlesen + differenz berechnen (in millisekunden)
 
 				res.add(currentRes); // Datenkapsel zu Liste hinzufügen
 			}

@@ -15,10 +15,11 @@ public class Main {
 	 * @throws InterruptedException
 	 */
 	static void test1() throws IOException, InterruptedException {
+		// Beide WordCounter erstellen (Wörter werden im Konstruktor gezählt):
 		WordCount wc = new WordCount("Grundgesetz.txt");
 		ParallelWordCount pwc = new ParallelWordCount("Grundgesetz.txt", 4, 8);
 
-		// Mengen aller gefundenen Wörter extrahieren:
+		// Mengen (Sets) aller gefundenen Wörter extrahieren:
 		Set<String> words = wc.getWords();
 		Set<String> pwords = pwc.getWords();
 
@@ -39,7 +40,9 @@ public class Main {
 		}
 
 		// Testen ob die Anzahlen aller gefundenen Wörter zwischen beiden Methoden übereinstimmen:
+		// Alle wörter durchlaufen:
 		for(String word : words) {
+			// Anzahlen vergleichen:
 			if(wc.getWordCount(word) != pwc.getWordCount(word)) {
 				throw new RuntimeException(
 					"Error! Word <" + word + "> was counted "
@@ -89,12 +92,13 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		try {
-			test1();
-			benchmark();
+			test1(); // korrektheit sicherstellen
+			benchmark(); // ParallelWordCount mit unterschiedlichen Parametern benchmarken
 
 			// Falls irgendein Test schiefgelaufen wäre und eine Exception geworfen worden wäre, würde dieser Punkt nicht erreicht werden:
 			System.out.println("All tests passed Successfully");
 		} catch(Exception e) {
+			// Exception wurde geworfen. In realer Applikation: z.B. Fehler anzeigen + Stacktrace in Datei schreiben
 			System.err.println("Tests failed. Exception:");
 			e.printStackTrace(System.err);
 		}

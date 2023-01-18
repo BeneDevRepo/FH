@@ -1,18 +1,17 @@
 package Counting;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.FileReader;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -32,7 +31,6 @@ public class ParallelWordCount {
 		if(filename == null)
 			throw new RuntimeException("Error: ParallelWordCount(): Null is not a valid filename");
 
-		// {
 		File file = new File(filename); // Datei-Objekt erstellen
 
 		// Prüfen ob die Datei existiert:
@@ -46,25 +44,23 @@ public class ParallelWordCount {
 		// Prüfen ob die Datei lesbar ist:
 		if(!file.canRead())
 			throw new RuntimeException("Error: ParallelWordCount(): file at path <" + filename + "> is not readable.");
-		// }
 
 		// ExecutorService zum Verwalten der Zeilen-Threads erstellen:
 		ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-		// ThreadPoolExecutor a = new ThreadPoolExecutor(8, 8, 0, null, null);
 		
 		// Datei zeile für Zeile einlesen und verarbeiten:
-		// try (BufferedReader f = new BufferedReader(new FileReader(filename, StandardCharsets.UTF_8))) {
-		try (BufferedReader f = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
+		try (BufferedReader f = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) { // Try-with-resources, um datei im Fehlerfall automatisch zu shcliessen
 			String line = null; // aktuelle Zeile
 			List<String> lines = new ArrayList<>(); // liste an Zeilen für den Nächsten Thread
 
+			// Datei zeilenweise durchlaufen:
 			for (int lineIndex = 0; (line = f.readLine()) != null; ) {
 				lines.add(line);
 
-				lineIndex++;
-				if(lineIndex == numLinesPerThread) {
-					LineWordCount lwc = new LineWordCount(lines); // Runnable für aktuelle Zeile erstellen
-					executor.execute(lwc); // runnable in beliebigem thread des executorService ausführen
+				lineIndex++; // Zeilen durchzählen
+				if(lineIndex == numLinesPerThread) { // Alle <numLinesPerThread> Zeilen ein LineWordCount-Objekt erstellen
+					LineWordCount lwc = new LineWordCount(lines); // LineWordCount für aktuelle Zeilen erstellen
+					executor.execute(lwc); // runnable in beliebigem thread des executorService ausführen (bzw. schedulen)
 					
 					lines = new ArrayList<>();
 					lineIndex = 0;
