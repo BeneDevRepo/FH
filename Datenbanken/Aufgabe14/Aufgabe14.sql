@@ -11,11 +11,11 @@ GRANT SELECT ON v_nn TO NN;
 
 -- Aufgabe 2:
 
-CREATE OR ALTER view V_NN2
+CREATE OR ALTER view V2_NN
 AS SELECT * FROM Leser
 WHERE LeserOID IN (SELECT LeserOID FROM Vormerkung);
 
-GRANT SELECT ON V_NN2 TO NN;
+GRANT SELECT ON V2_NN TO NN;
 
 
 
@@ -27,21 +27,21 @@ GRANT SELECT ON V_NN TO public;
 
 -- Aufgabe 4:
 
-CREATE ROLE Leserbetreuer2;
+CREATE ROLE LeserBetreuer;
 
-GRANT SELECT, delete ON Leser TO Leserbetreuer2;
+GRANT SELECT, delete ON Leser TO LeserBetreuer;
 
-GRANT UPDATE (Mail) ON Leser TO Leserbetreuer2;
+GRANT UPDATE (Mail) ON Leser TO LeserBetreuer;
 
-GRANT SELECT, UPDATE ON Mahnung TO Leserbetreuer2;
+GRANT SELECT, UPDATE ON Mahnung TO LeserBetreuer;
 
 
 
 -- Aufgabe 5:
 
-CREATE USER ZZ PASSWORD '12345';
+CREATE USER ZZ PASSWORD '1234';
 
-GRANT Leserbetreuer2 TO ZZ;
+GRANT LeserBetreuer TO ZZ;
 
 
 
@@ -59,6 +59,7 @@ AS
 BEGIN
   EXECUTE PROCEDURE EinfuegenExemplar(new.BuchOID);
 END 
+
 
 CREATE OR ALTER PROCEDURE EinfuegenExemplar(nummer integer)
 AS
