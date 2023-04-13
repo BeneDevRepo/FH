@@ -1,0 +1,102 @@
+Aufgabe 1)
+a)
+mit VLANs
+
+b)
+
+vlan 2
+name IT
+state active
+ip routing
+no shutdown
+ip add 172.17.99.* 255.255.255.0
+ip default-gateway 172.17.99.1
+
+
+
+
+vlan 3
+name Studierende
+state active
+ip routing
+no shutdown
+ip add 172.17.99.* 255.255.255.0
+
+
+
+
+
+
+vlan 4
+name Mitarbeiter
+state active
+ip routing
+no shutdown
+ip add 172.17.99.* 255.255.255.0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Aufgabe 5)
+Das STP-Protokoll stellt sicher, dass Pakete zwischen 2 Rechnern eindeutig weitergeleitet werden können,
+also dass immer nur genau 1 Datenpfad eexistiert, um u.A. Broadcast-Stürme zu vermeiden.
+
+Hierzu wird eine als Root bridge die Bridge mit der kleinsten Bridge-ID (und im Falle einer Kollision die Bridge mit der kleineren MAC-Addresse)
+festgelegt, von der alle weiteren Pfade berechnet werden.
+Alle weiteren Pfade werden als Baumstruktur von der Root Bridge aus aufgespannt,
+wobei im Falle von redundanten Pfaden stets der Pfad mit den höheren "Pfadkosten" durch deaktivieren des entsprechenden Portes eliminiert wird.
+Konkret wird für diesen Algorithmus jedem Port ein Zustand zugewiesen: Disabled, Blocking, Listening, Learning oder Forwarding, wobei der Startzustand stets Blocking ist.
+Im nächsten Schritt wählt jeder Switch den Port mit den geringsten Pfadkosten zu Rootbridge bzw. als Root-Port aus.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

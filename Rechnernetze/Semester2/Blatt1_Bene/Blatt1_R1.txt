@@ -1,0 +1,52 @@
+Aufgabe 2)
+
+enable
+configure terminal
+
+# b) Änderung des Hostnamens:
+hostname R1
+
+# c) Abschaltung von DNS-Lookups
+no ip domain-lookup
+
+# d) Konsolenzugriff absichern (PW: "cisco")
+line console 0
+password cisco
+login
+exit
+
+# e) Absicherung des „privileged Exec Mode“ (PW: "class")
+enable password class
+
+# f) Verschlüsselung aller Passwörter
+service password-encryption
+
+# g) Definierung eines MOTD-Banners
+banner motd # MOTD BANNER MESSAGE #
+
+
+
+# h) Abschaltung aller (ungenutzten) Anschlüsse
+interface range GigabitEthernet 0/0-1
+shutdown
+exit
+
+# i) Zuweisung von geeigneten IP-Adressen gemäß Adressbereiche
+interface GigabitEthernet 0/0
+ip address 172.17.99.1 255.255.255.0
+no shutdown
+exit
+
+
+# j) Einrichtung von SSH
+ip domain-name r1
+crypto key generate rsa
+username cisco
+line vty 0 15
+password cisco
+login
+transport input ssh
+360
+
+# Speichern der Konfiguration:
+copy running-config startup-config
