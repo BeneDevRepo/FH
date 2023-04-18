@@ -1,0 +1,41 @@
+Tests:
+
+1)
+(NN)
+SELECT * FROM V_NN;
+
+2)
+(NN)
+SELECT * FROM V2_NN;
+
+
+3)
+(Pub)
+SELECT * FROM V_NN;   -> success
+SELECT * FROM V2_NN;  -> fail
+
+
+5)
+(zz)
+update leser set mail='geändert' where vorname =  'Darth';
+
+update Mahnung set MahnungBetrag = 2000
+WHERE LeserOID IN (
+	SELECT LeserOID FROM Leser
+	WHERE Nachname = 'Maier'
+);
+
+select * from Mahnung
+WHERE LeserOID IN (
+	SELECT LeserOID FROM Leser
+	WHERE Nachname = 'Maier'
+)
+
+select * from Mahnung;
+update Mahnung SET Exemplaroid = 100 where LeserOid = 1;
+
+delete from leser where vorname = 'Darth';
+
+
+7)
+insert into Buch (Titel, Autor, BuchOID) values('Harry Potter', 'J.K.Rowling', 123);
